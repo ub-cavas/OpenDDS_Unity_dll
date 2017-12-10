@@ -40,6 +40,14 @@ public:
 		queue_.pop();
 	}
 
+	//rd swap QueueTS queue with standard std::queue
+	void swap(std::queue<T>* p_queue) {
+		std::unique_lock<std::mutex> mlock(mutex_);
+		queue_.swap( *p_queue);
+		mlock.unlock();
+		cond_.notify_one();
+	}
+
 	void push(const T& item)
 	{
 		std::unique_lock<std::mutex> mlock(mutex_);

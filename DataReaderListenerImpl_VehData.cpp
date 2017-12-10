@@ -13,7 +13,6 @@
 #include "MriTypeSupportImpl.h"
 
 #include <iostream>	//cout, endl
-//#include <boost/lockfree/queue.hpp>	
 #include "QueueTs.h"
 
 
@@ -22,8 +21,6 @@ using std::cout;
 using std::endl;
 using std::string;
 
-
-//extern boost::lockfree::queue<Mri::VehData> vehdata_queue;
 extern QueueTs<Mri::VehData> vehdata_queue;
 
 
@@ -51,31 +48,7 @@ DataReaderListenerImpl_VehData::on_data_available(DDS::DataReader_ptr reader)
 		//cout << "SampleInfo.instance_state = " << info.instance_state << endl;
 
 		if (info.valid_data) {
-
-		
-			
-			//buffor.push_back(z);
-
-			//vehdata_queue.push(veh_message);
-			
-			vehdata_queue.push(veh_message);
-
-
-
-
-
-
-
-
-			//cout << csvConvertVehDataToString(veh_message);
-
-				/*<< "     position_x  = " << veh_message.position_x << endl
-				<< "      timestamp  =" << veh_message.timestamp << endl;*/
-				
-				//<< "         str1       = " << aux_message.str1 << std::endl
-				//<< "         str2       = " << aux_message.str2 << std::endl
-				//<< "         tag        = " << aux_message.tag << std::endl;
-
+			vehdata_queue.push(veh_message);			
 		}
 
 	}

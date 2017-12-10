@@ -123,7 +123,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>E:\boost_1_64_0;$(DDS_ROOT);$(ACE_ROOT);$(TAO_ROOT);..\..\..;$(TAO_ROOT)\orbsvcs;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(DDS_ROOT);$(ACE_ROOT);$(TAO_ROOT);..\..\..;$(TAO_ROOT)\orbsvcs;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;WIN32;_CONSOLE;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;MPC_LIB_MODIFIER="d";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -302,10 +302,11 @@
     <ClCompile Include="DataWriter_VehData.cpp" />
     <ClCompile Include="main.cpp">
     </ClCompile>
-    <ClCompile Include="OpenDDSThread.cpp" />
+    <ClCompile Include="OpenDDST.cpp" />
     <ClCompile Include="TimeSyncClient.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="main.h" />
     <ClInclude Include="QueueTs.h" />
     <ClInclude Include="DataReaderListenerImpl_Aux2Strings.h" />
     <ClInclude Include="DataReaderListenerImpl_V2XMessage.h" />
@@ -316,7 +317,8 @@
     <ClInclude Include="DataWriter_Aux2Strings.h" />
     <ClInclude Include="DataWriter_V2XMessage.h" />
     <ClInclude Include="DataWriter_VehData.h" />
-    <ClInclude Include="OpenDDSThread.h" />
+    <ClInclude Include="OpenDDS.h" />
+    <ClInclude Include="Sleep.h" />
     <ClInclude Include="TimeSync.h" />
   </ItemGroup>
   <ItemGroup>

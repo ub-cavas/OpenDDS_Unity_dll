@@ -7,6 +7,8 @@
 #include <iostream> //cout
 #include <ctime> //time format
 #include <conio.h> //key press
+#include <map>	//map - list of vehicles
+
 
 
 
@@ -19,7 +21,7 @@
 
 #include "QueueTs.h"
 #include "TimeSync.h"
-#include "OpenDDSThread.h"
+#include "OpenDDS.h"
 
 using std::cerr;
 using std::cout;
@@ -29,32 +31,84 @@ using std::string;
 
 Mri::Aux2StringsDataWriter_var  writer_global_aux2strings;
 Mri::V2XMessageDataWriter_var  writer_global_v2xmessage;
-
-//boost::lockfree::queue<Mri::VehData> vehdata_queue{ 1000 };		//size = 1000
+long veh_id_to_remove;
 
 QueueTs<Mri::VehData> vehdata_queue;
+std::map<long, Mri::VehData> vehs_map;
+
+//std::queue<Mri::V2XMessage> v2x_queue;
+QueueTs<Mri::V2XMessage> v2x_queue;
+
+
 bool finish_application;
+bool threadOpenDDS_initialized;
 
 
-bool getInput(char *c)
-{
-	if (_kbhit())
+
+
+void vehsMapThread() {
+	
+
+	Mri::VehData _veh;
+	
+	//std::map<long, Mri::VehData> vehs_map;
+	std::map<long, Mri::VehData>::iterator it;
+	
+	veh_id_to_remove = -1; // initial value
+	
+	while (!finish_application)
 	{
-		*c = _getch();
-		return true; // Key Was Hit
+		//wait for something at the queue
+		vehdata_queue.pop(_veh);
+		{
+			it = vehs_map.find(_veh.vehicle_id);
+			if (it != vehs_map.end()) {
+				//there is a car with id = _veh.vehicle_id
+
+
+				//check if new data is older than in vehs_map
+				if (_veh.timestamp >  it->second.timestamp)
+				{
+					//update data in vehs_map
+					vehs_map[it->first] = _veh;
+				}
+				else
+				{
+					cout << "OpenDDS data is older than data in vehs_list. Veh_id=" << _veh.vehicle_id
+						<< " timestamp_vehs_list=" << it->second.timestamp
+						<< " timestamp_OpenDDS=" << _veh.timestamp << endl;
+				}
+			}
+			else
+			{
+				//no car with id = _veh.vehicle_id
+				vehs_map.emplace(_veh.vehicle_id, _veh);
+
+			}
+
+
+
+			//check if we have to remove a car
+
+			if (veh_id_to_remove!=-1)
+			{
+				it = vehs_map.find(veh_id_to_remove);
+				if (it != vehs_map.end()) 
+				{
+					vehs_map.erase(it);
+					cout << endl << "####################################################################################" << endl;
+					cout << "############  Removed from vehsMap vehicle_id =" << veh_id_to_remove << "     ############" << endl<<endl;
+					veh_id_to_remove = -1; //reset this variable
+				}
+			}
+
+
+
+			//cout << "Timestamp: " << _veh.timestamp << " id=" << _veh.vehicle_id << endl;
+
+			//cout << "Timestamp: " << _veh.timestamp << " size of map=" << vehs_map.size() << endl << endl;
+		}
 	}
-	return false; // No keys were pressed
-}
-//void OpenDDSThread(int argc, char* argv[])
-
-
-void startOpenDDSThread(int argc, char* argv[]) {
-	// start thread OpenDDS
-
-	finish_application = false;
-	std::thread threadOpenDDS(OpenDDSThread, argc, argv);
-	//close thread
-	threadOpenDDS.join();
 }
 
 
@@ -77,10 +131,6 @@ void OpenDDSThread(int argc, char* argv[]){
 	{
 		std::thread threadTimestamp(TimestampThread);
 		//std::cout << "*****************   Timestamp: " << GetTimestamp() << std::endl << std::endl;
-		
-		
-
-
 
 		// Initialize DomainParticipantFactory
  		DDS::DomainParticipantFactory_var dpf =
@@ -98,8 +148,6 @@ void OpenDDSThread(int argc, char* argv[]){
 		else {
 			cout << "Participant: participant created successfully" << endl;
 		}
-
-
 
 		// Create Subscriber
 		DDS::Subscriber_var subscriber = participant->create_subscriber(
@@ -127,16 +175,14 @@ void OpenDDSThread(int argc, char* argv[]){
 			cout << "PublisherClass: publisher created correctly" << endl;
 		}
 
-
-
 		// run timestamp synchronization
 		TimeSynchronization(participant, subscriber, publisher);
 
 
 		//create reader to receive V2X message  Mri_V2XfromNS3  Mri_V2XtoNS3
-		DataReader_V2XMessage reader_v2xmessage(participant, subscriber, "Mri_V2XfromNS3");
+		DataReader_V2XMessage reader_v2xmessage(participant, subscriber, "Mri_V2XtoNS3");
 		// writer
-		DataWriter_V2XMessage writer_v2xMessage(participant, publisher, "Mri_V2XtoNS3");
+		//DataWriter_V2XMessage writer_v2xMessage(participant, publisher, "Mri_V2XtoNS3");
 
 
 		// topics:	Mri_TrafficVeh Mri_SubjectCar
@@ -146,105 +192,36 @@ void OpenDDSThread(int argc, char* argv[]){
 		DataReader_VehData reader_subject_car(participant, subscriber, "Mri_SubjectCar");
 
 
+
+		long old_veh_timestamp = 0;
+		std::map<long, Mri::VehData> vehs_map_copy;
 		
-		////VehData DataReaders
-
-		//// Register TypeSupport 
-		//Mri::VehDataTypeSupport_var  ts =
-		//	new Mri::VehDataTypeSupportImpl;
-
-		//if (ts->register_type(participant, "") != DDS::RETCODE_OK) {
-		//	throw std::string("Failed to register VehData type support");
-		//}
-
-
-		//// Reader Mri_TrafficVeh
-
-		//// Create Topic Mri_TrafficVeh
-		//CORBA::String_var type_name = ts->get_type_name();
-		//DDS::Topic_var topic_traffic_vehs =
-		//	participant->create_topic(topic_traffic_vehs_name,
-		//		type_name,
-		//		TOPIC_QOS_DEFAULT,
-		//		DDS::TopicListener::_nil(),
-		//		OpenDDS::DCPS::DEFAULT_STATUS_MASK);
-
-		//// Check for failure
-		//if (!topic_traffic_vehs) {
-		//	throw std::string("Failed to create topic Mri_TrafficVeh");
-		//}
-
-
-		//// Create DataReader
-		//DDS::DataReaderListener_var listener(new DataReaderListenerImpl_VehData);
-
-
-		//DDS::DataReaderQos dr_qos;
-		//subscriber->get_default_datareader_qos(dr_qos);
-		//dr_qos.history.kind = DDS::KEEP_ALL_HISTORY_QOS;
-		//dr_qos.reliability.kind = DDS::BEST_EFFORT_RELIABILITY_QOS;
-		//dr_qos.reliability.max_blocking_time.sec = 0;
-		//dr_qos.reliability.max_blocking_time.nanosec = 2000;
-		//dr_qos.resource_limits.max_samples_per_instance = DDS::LENGTH_UNLIMITED;
-
-
-		//DDS::DataReader_var reader_traffic_vehs =
-		//	subscriber->create_datareader(topic_traffic_vehs,
-		//		DATAREADER_QOS_DEFAULT,
-		//		listener,
-		//		OpenDDS::DCPS::DEFAULT_STATUS_MASK);
-
-		//// Check for failure
-		//if (!reader_traffic_vehs) {
-		//	throw std::string("failed to create data reader traffic_vehs");
-		//}
-
-
-
-
-
-		//// Create Topic "Mri_SubjectCar"
-		////CORBA::String_var type_name = ts->get_type_name();
-		//DDS::Topic_var topic_subject_car =
-		//	participant->create_topic(topic_subject_car_name,
-		//		type_name,	//this is the same type like in topic_traffic_vehs
-		//		TOPIC_QOS_DEFAULT,
-		//		DDS::TopicListener::_nil(),
-		//		OpenDDS::DCPS::DEFAULT_STATUS_MASK);
-
-		//// Check for failure
-		//if (!topic_subject_car) {
-		//	throw std::string("Failed to create topic Mri_TrafficVeh");
-		//}
-
-		//DDS::DataReader_var reader_subject_car =
-		//	subscriber->create_datareader(topic_subject_car,
-		//		DATAREADER_QOS_DEFAULT,
-		//		listener,
-		//		OpenDDS::DCPS::DEFAULT_STATUS_MASK);
-
-		//// Check for failure
-		//if (!reader_subject_car) {
-		//	throw std::string("failed to create data reader subject car");
-		//}
-
-
-		Mri::VehData _veh;
+		threadOpenDDS_initialized = true;
 
 		while (key != 'q')
 		{
 			//Sleep(200);
 			getInput(&key);
 
-			vehdata_queue.pop(_veh);
+			Sleep(100);
+			old_veh_timestamp = GetTimestamp() - 50;	//to find veh data not updated for 50 x 10ms = 500 ms
+			if (vehs_map.size() > 0)
 			{
-				cout << "Timestamp: " << _veh.timestamp << " id=" << _veh.vehicle_id << endl;
+				vehs_map_copy = vehs_map;
+
+				for (auto& x : vehs_map_copy) {
+					if (x.second.timestamp < old_veh_timestamp)
+					{
+						//select this veh_id to removing
+						veh_id_to_remove = x.second.vehicle_id;
+
+					}
+					//std::cout << "timestamp=" << x.second.timestamp << " veh_id=" << x.second.vehicle_id << " x=" << x.second.position_x << " y=" << x.second.position_y << std::endl;
+				}
+				//std::cout << std::endl << std::endl;
 			}
 
 		}
-
-
-		//close thread
 
 		
 
@@ -255,20 +232,22 @@ void OpenDDSThread(int argc, char* argv[]){
 		TheServiceParticipant->shutdown();
 		
 		threadTimestamp.detach();
-		finish_application = true; //it breaks waiting "while .. " and close app 
+		finish_application = true; 
 		
 	}
 	catch (const CORBA::Exception& e) {
 		e._tao_print_exception("Exception caught in OpenDDSThread:");
 		
 	}
+}
 
 
-
-	/*while (true)
+bool getInput(char *c)
+{
+	if (_kbhit())
 	{
-	Sleep(1000);
-	}*/
-
-
+		*c = _getch();
+		return true; // Key Was Hit
+	}
+	return false; // No keys were pressed
 }
