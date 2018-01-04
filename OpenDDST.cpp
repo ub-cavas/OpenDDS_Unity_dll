@@ -198,6 +198,10 @@ void OpenDDSThread(int argc, char* argv[]){
 		
 		threadOpenDDS_initialized = true;
 
+		//----------------------------------------------------------------------------------------------------------
+
+
+
 		while (key != 'q')
 		{
 			//Sleep(200);
@@ -225,6 +229,8 @@ void OpenDDSThread(int argc, char* argv[]){
 
 		
 
+
+		//-------------------------------------------------------------------------------------------------
 		// Clean-up!
 		participant->delete_contained_entities();
 		dpf->delete_participant(participant);

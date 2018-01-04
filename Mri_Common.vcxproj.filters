@@ -25,6 +25,9 @@
       <UniqueIdentifier>{763028EF-FECA-1BAD-6A4B-8A630000002E}</UniqueIdentifier>
       <Extensions>i;ipp;inl</Extensions>
     </Filter>
+    <Filter Include="Documentation">
+      <UniqueIdentifier>{B14BBA74-FECA-1BAD-6A4B-8A630000002E}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MriC.cpp">
@@ -85,5 +88,10 @@
     <None Include="MriTypeSupportC.inl">
       <Filter>Inline Files</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="recorder.txt">
+      <Filter>Documentation</Filter>
+    </CustomBuild>
   </ItemGroup>
 </Project>

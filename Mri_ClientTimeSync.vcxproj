@@ -23,7 +23,6 @@
     <ProjectGuid>{F45EEE7F-FECA-1BAD-6A4B-8A630000002E}</ProjectGuid>
     <RootNamespace>Mri_ClientTimeSync</RootNamespace>
     <Keyword>Win32Proj</Keyword>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -123,7 +122,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(DDS_ROOT);$(ACE_ROOT);$(TAO_ROOT);..\..\..;$(TAO_ROOT)\orbsvcs;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ACE_ROOT);$(TAO_ROOT);..\..\..;$(TAO_ROOT)\orbsvcs;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;WIN32;_CONSOLE;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;MPC_LIB_MODIFIER="d";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -142,7 +141,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>ACEd.lib;TAOd.lib;TAO_AnyTypeCoded.lib;TAO_PortableServerd.lib;TAO_CodecFactoryd.lib;TAO_PId.lib;TAO_BiDirGIOPd.lib;OpenDDS_Dcpsd.lib;OpenDDS_InfoRepoDiscoveryd.lib;OpenDDS_Tcpd.lib;TAO_Svc_Utilsd.lib;mriCommond.lib;iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)clientTimeSync.exe</OutputFile>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\..\lib\VS2010\$(Platform);.;$(ACE_ROOT)\lib;..\..\..\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>.;$(ACE_ROOT)\lib;..\..\..\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ProgramDatabaseFile>$(OutDir)\clientTimeSync_exe.pdb</ProgramDatabaseFile>
     </Link>
     <!-- "postclean" was made-up by MPC for use by vs_postclean.pl.
@@ -164,7 +163,7 @@
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>$(DDS_ROOT);$(ACE_ROOT);$(TAO_ROOT);..\..\..;$(TAO_ROOT)\orbsvcs;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ACE_ROOT);$(TAO_ROOT);..\..\..;$(TAO_ROOT)\orbsvcs;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;WIN32;_CONSOLE;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
@@ -252,7 +251,7 @@
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <AdditionalIncludeDirectories>$(ACE_ROOT);$(TAO_ROOT);..\..\..;$(TAO_ROOT)\orbsvcs;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NDEBUG;WIN32;_CONSOLE;_CRT_NONSTDC_NO_WARNINGS;_AMD64_;_WIN64;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;WIN32;_CONSOLE;_CRT_NONSTDC_NO_WARNINGS;_AMD64_;_WIN64;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <WarningLevel>Level3</WarningLevel>
@@ -288,11 +287,11 @@
   <ItemGroup>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="DataReaderListenerImpl_Aux2Strings.cpp">
+    </ClCompile>
     <ClCompile Include="DataReaderListenerImpl_V2XMessage.cpp" />
     <ClCompile Include="DataReaderListenerImpl_VehData.cpp" />
     <ClCompile Include="DataReader_Aux2Strings.cpp">
-    </ClCompile>
-    <ClCompile Include="DataReaderListenerImpl_Aux2Strings.cpp">
     </ClCompile>
     <ClCompile Include="DataReader_V2XMessage.cpp" />
     <ClCompile Include="DataReader_VehData.cpp" />
@@ -300,14 +299,21 @@
     </ClCompile>
     <ClCompile Include="DataWriter_V2XMessage.cpp" />
     <ClCompile Include="DataWriter_VehData.cpp" />
+    <ClCompile Include="OpenDDST.cpp" />
+    <ClCompile Include="ParticipantClass.cpp">
+    </ClCompile>
+    <ClCompile Include="PublisherClass.cpp">
+    </ClCompile>
+    <ClCompile Include="SubscriberClass.cpp">
+    </ClCompile>
+    <ClCompile Include="TimeSyncClient.cpp">
+    </ClCompile>
+    <ClCompile Include="TimeSyncServer.cpp">
+    </ClCompile>
     <ClCompile Include="main.cpp">
     </ClCompile>
-    <ClCompile Include="OpenDDST.cpp" />
-    <ClCompile Include="TimeSyncClient.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="main.h" />
-    <ClInclude Include="QueueTs.h" />
     <ClInclude Include="DataReaderListenerImpl_Aux2Strings.h" />
     <ClInclude Include="DataReaderListenerImpl_V2XMessage.h" />
     <ClInclude Include="DataReaderListenerImpl_VehData.h" />
@@ -317,9 +323,15 @@
     <ClInclude Include="DataWriter_Aux2Strings.h" />
     <ClInclude Include="DataWriter_V2XMessage.h" />
     <ClInclude Include="DataWriter_VehData.h" />
+    <ClInclude Include="mriCommon_Export.h" />
     <ClInclude Include="OpenDDS.h" />
+    <ClInclude Include="ParticipantClass.h" />
+    <ClInclude Include="PublisherClass.h" />
+    <ClInclude Include="QueueTs.h" />
     <ClInclude Include="Sleep.h" />
+    <ClInclude Include="SubscriberClass.h" />
     <ClInclude Include="TimeSync.h" />
+    <ClInclude Include="main.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="mri.mpc">

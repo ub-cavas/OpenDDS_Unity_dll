@@ -2,19 +2,24 @@
 
 #include <iostream> //cout
 #include <queue>
+#include <utility>      // std::pair, std::make_pair
+#include <math.h>       // pow, sqrt
+#include <stdlib.h>     /* srand, rand */
 
 #include <dds/DCPS/Service_Participant.h>	//neccessary to start OpenDDSThreat without error
 #include "OpenDDS.h"	//to start OpenDDSThread
 #include "MriTypeSupportImpl.h"	//Mri data formats
 
 #include "Sleep.h"	// Sleep()
-#include "TimeSync.h"	//Sleep() 
+#include "TimeSync.h"
 #include "QueueTs.h"
 #include "main.h"
 
 
 extern bool finish_application;
 extern bool threadOpenDDS_initialized;
+
+extern std::map<long, Mri::VehData> vehs_map;
 
 extern QueueTs<Mri::V2XMessage> v2x_queue;
 std::map<long, Mri::V2XMessage> v2xs_map;
@@ -28,7 +33,7 @@ long sample_counter_per_timestamp;	//used by generateV2xUniqueTimestamp
 int main(int argc, char* argv[]) {
 
 	std::map<long, Mri::V2XMessage> v2xs_map;
-	std::map<long, Mri::V2XMessage>::iterator it_v2x;
+	
 	timestamp_previous = 0;	//initial value
 	
 	threadOpenDDS_initialized = false;
@@ -41,12 +46,15 @@ int main(int argc, char* argv[]) {
 	
 	std::thread threadVehsMap(vehsMapThread);
 
+
+	srand(time(NULL));
+
 	while (!finish_application)
 	{
 		//NS3 simulation thread
 		doSimulation();
-		v2xsMapGarbageCollection(2000);
-		Sleep(500);
+		v2xsMapGarbageCollection(5000);
+		Sleep(100);
 	}
 	//wait for a finish of all threads
 	Sleep(500);
@@ -66,7 +74,7 @@ void v2xsMapGarbageCollection(long interval_ms) {
 		if (x->first < timestamp_older)
 		{
 			x = v2xs_map.erase(x);
-			std::cout << "Erased v2x id:" << x->first << std::endl;
+			//std::cout << "Erased v2x id:" << x->first << std::endl;
 		}
 		else
 		{
@@ -95,9 +103,11 @@ void doSimulation() {
 		v2x_extended_timestamp = generateV2xUniqueTimestamp(v2x.sender_timestamp);
 		addV2xToMap(v2x_extended_timestamp, v2x);
 
-		std::cout << "V2X: senderId  = " << v2x.sender_id
+		/*std::cout << "V2X: senderId  = " << v2x.sender_id
 			<< "     receiverId = " << v2x.recipient_id
-			<< "sender_timestamp=" << v2x.sender_timestamp << std::endl;
+			<< "sender_timestamp=" << v2x.sender_timestamp << std::endl;*/
+
+		transmitV2X(v2x, 1);
 	}
 	std::cout << std::endl << std::endl;
 }
@@ -132,4 +142,51 @@ void addV2xToMap(long extended_timestamp, Mri::V2XMessage v2x) {
 	{
 		v2xs_map.emplace(extended_timestamp, v2x);
 	}
+}
+
+
+void transmitV2X(Mri::V2XMessage v2x, long destination_veh_id) {
+
+	const double V2X_RANGE = 150.0; //150 meters
+
+	try
+	{
+		if (v2x.sender_id != destination_veh_id)
+		{
+			Mri::VehData veh_sender = vehs_map[v2x.sender_id];
+			Mri::VehData veh_receiver = vehs_map[destination_veh_id];
+
+
+
+			double distance = sqrt(pow((veh_receiver.position_x - veh_sender.position_x), 2.0) + pow((veh_receiver.position_y - veh_sender.position_y), 2.0));
+
+			if (distance < V2X_RANGE)
+			{
+				//transmit
+				long  delay = rand() % 50 + 15;	// delay 15 - 64 ms
+												//update data in v2x message
+
+				v2x.recipient_id = destination_veh_id;
+				v2x.recipient_timestamp = v2x.sender_timestamp + (delay / 10);
+
+				// resend v2x
+				std::cout << "@@ RESEND V2X from veh_id:" << v2x.sender_id << " to veh_id:" << v2x.recipient_id << " timestamps: "
+					<< v2x.sender_timestamp << " -> " << v2x.recipient_timestamp << std::endl;
+			}
+			else
+			{
+				std::cout << "-- NO TRANSMITION from veh_id:" << v2x.sender_id << " to veh_id:" << v2x.recipient_id << " timestamps: "
+					<< v2x.sender_timestamp << " distance=" << distance << std::endl;
+			}
+		}
+		
+
+
+	}
+	catch (const std::exception&)
+	{
+		//do nothing
+		//transmit nothing
+	}
+
 }
