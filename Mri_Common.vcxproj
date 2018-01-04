@@ -355,32 +355,32 @@ endlocal</Command>
     <CustomBuild Include="Mri.idl">
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
 PATH=%PATH%;$(ACE_ROOT)\lib;$(ACE_ROOT)\lib
-cmd /c "..\..\..\bin\opendds_idl -Sa -St -Wb,export_macro=mriCommon_Export "Mri.idl" &amp;&amp; cmd /c "$(ACE_ROOT)\bin\tao_idl -Wb,pre_include=ace/pre.h -Wb,post_include=ace/post.h -I$(TAO_ROOT) -Sa -St -I..\..\.. -I$(TAO_ROOT)/orbsvcs -Wb,export_macro=mriCommon_Export -Wb,export_include=mriCommon_Export.h "Mri.idl""
+cmd /c "$(ACE_ROOT)\bin\tao_idl -Wb,pre_include=ace/pre.h -Wb,post_include=ace/post.h -I$(TAO_ROOT) -Sa -St -I..\..\.. -I$(TAO_ROOT)/orbsvcs -Wb,export_macro=mriCommon_Export -Wb,export_include=mriCommon_Export.h "Mri.idl" &amp;&amp; cmd /c "..\..\..\bin\opendds_idl -Sa -St -Wb,export_macro=mriCommon_Export "Mri.idl""
 endlocal</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Invoking "..\..\..\bin\opendds_idl and $(ACE_ROOT)\bin\tao_idl on Mri.idl"</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Invoking "$(ACE_ROOT)\bin\tao_idl and ..\..\..\bin\opendds_idl on Mri.idl"</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">MriC.cpp;MriC.h;MriC.inl;MriS.cpp;MriS.h;MriTypeSupport.idl;MriTypeSupportImpl.cpp;MriTypeSupportImpl.h</Outputs>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\..\..\bin\opendds_idl.exe;..\..\..\dds\idl\IDLTemplate.txt;$(ACE_ROOT)\bin\tao_idl.exe;$(ACE_ROOT)\lib\TAO_IDL_BEd.dll;$(ACE_ROOT)\lib\TAO_IDL_FEd.dll</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ACE_ROOT)\bin\tao_idl.exe;..\..\..\bin\opendds_idl.exe;..\..\..\dds\idl\IDLTemplate.txt;$(ACE_ROOT)\lib\TAO_IDL_BEd.dll;$(ACE_ROOT)\lib\TAO_IDL_FEd.dll</AdditionalInputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
 PATH=%PATH%;$(ACE_ROOT)\lib;$(ACE_ROOT)\lib
-cmd /c "..\..\..\bin\opendds_idl -Sa -St -Wb,export_macro=mriCommon_Export "Mri.idl" &amp;&amp; cmd /c "$(ACE_ROOT)\bin\tao_idl -Wb,pre_include=ace/pre.h -Wb,post_include=ace/post.h -I$(TAO_ROOT) -Sa -St -I..\..\.. -I$(TAO_ROOT)/orbsvcs -Wb,export_macro=mriCommon_Export -Wb,export_include=mriCommon_Export.h "Mri.idl""
+cmd /c "$(ACE_ROOT)\bin\tao_idl -Wb,pre_include=ace/pre.h -Wb,post_include=ace/post.h -I$(TAO_ROOT) -Sa -St -I..\..\.. -I$(TAO_ROOT)/orbsvcs -Wb,export_macro=mriCommon_Export -Wb,export_include=mriCommon_Export.h "Mri.idl" &amp;&amp; cmd /c "..\..\..\bin\opendds_idl -Sa -St -Wb,export_macro=mriCommon_Export "Mri.idl""
 endlocal</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Invoking "..\..\..\bin\opendds_idl and $(ACE_ROOT)\bin\tao_idl on Mri.idl"</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Invoking "$(ACE_ROOT)\bin\tao_idl and ..\..\..\bin\opendds_idl on Mri.idl"</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MriC.cpp;MriC.h;MriC.inl;MriS.cpp;MriS.h;MriTypeSupport.idl;MriTypeSupportImpl.cpp;MriTypeSupportImpl.h</Outputs>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\..\..\bin\opendds_idl.exe;..\..\..\dds\idl\IDLTemplate.txt;$(ACE_ROOT)\bin\tao_idl.exe;$(ACE_ROOT)\lib\TAO_IDL_BE.dll;$(ACE_ROOT)\lib\TAO_IDL_FE.dll</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ACE_ROOT)\bin\tao_idl.exe;..\..\..\bin\opendds_idl.exe;..\..\..\dds\idl\IDLTemplate.txt;$(ACE_ROOT)\lib\TAO_IDL_BE.dll;$(ACE_ROOT)\lib\TAO_IDL_FE.dll</AdditionalInputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
 PATH=%PATH%;$(ACE_ROOT)\lib;$(ACE_ROOT)\lib
-cmd /c "..\..\..\bin\opendds_idl -Sa -St -Wb,export_macro=mriCommon_Export "Mri.idl" &amp;&amp; cmd /c "$(ACE_ROOT)\bin\tao_idl -Wb,pre_include=ace/pre.h -Wb,post_include=ace/post.h -I$(TAO_ROOT) -Sa -St -I..\..\.. -I$(TAO_ROOT)/orbsvcs -Wb,export_macro=mriCommon_Export -Wb,export_include=mriCommon_Export.h "Mri.idl""
+cmd /c "$(ACE_ROOT)\bin\tao_idl -Wb,pre_include=ace/pre.h -Wb,post_include=ace/post.h -I$(TAO_ROOT) -Sa -St -I..\..\.. -I$(TAO_ROOT)/orbsvcs -Wb,export_macro=mriCommon_Export -Wb,export_include=mriCommon_Export.h "Mri.idl" &amp;&amp; cmd /c "..\..\..\bin\opendds_idl -Sa -St -Wb,export_macro=mriCommon_Export "Mri.idl""
 endlocal</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Invoking "..\..\..\bin\opendds_idl and $(ACE_ROOT)\bin\tao_idl on Mri.idl"</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Invoking "$(ACE_ROOT)\bin\tao_idl and ..\..\..\bin\opendds_idl on Mri.idl"</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MriC.cpp;MriC.h;MriC.inl;MriS.cpp;MriS.h;MriTypeSupport.idl;MriTypeSupportImpl.cpp;MriTypeSupportImpl.h</Outputs>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\..\..\bin\opendds_idl.exe;..\..\..\dds\idl\IDLTemplate.txt;$(ACE_ROOT)\bin\tao_idl.exe;$(ACE_ROOT)\lib\TAO_IDL_BEd.dll;$(ACE_ROOT)\lib\TAO_IDL_FEd.dll</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ACE_ROOT)\bin\tao_idl.exe;..\..\..\bin\opendds_idl.exe;..\..\..\dds\idl\IDLTemplate.txt;$(ACE_ROOT)\lib\TAO_IDL_BEd.dll;$(ACE_ROOT)\lib\TAO_IDL_FEd.dll</AdditionalInputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
 PATH=%PATH%;$(ACE_ROOT)\lib;$(ACE_ROOT)\lib
-cmd /c "..\..\..\bin\opendds_idl -Sa -St -Wb,export_macro=mriCommon_Export "Mri.idl" &amp;&amp; cmd /c "$(ACE_ROOT)\bin\tao_idl -Wb,pre_include=ace/pre.h -Wb,post_include=ace/post.h -I$(TAO_ROOT) -Sa -St -I..\..\.. -I$(TAO_ROOT)/orbsvcs -Wb,export_macro=mriCommon_Export -Wb,export_include=mriCommon_Export.h "Mri.idl""
+cmd /c "$(ACE_ROOT)\bin\tao_idl -Wb,pre_include=ace/pre.h -Wb,post_include=ace/post.h -I$(TAO_ROOT) -Sa -St -I..\..\.. -I$(TAO_ROOT)/orbsvcs -Wb,export_macro=mriCommon_Export -Wb,export_include=mriCommon_Export.h "Mri.idl" &amp;&amp; cmd /c "..\..\..\bin\opendds_idl -Sa -St -Wb,export_macro=mriCommon_Export "Mri.idl""
 endlocal</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Invoking "..\..\..\bin\opendds_idl and $(ACE_ROOT)\bin\tao_idl on Mri.idl"</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Invoking "$(ACE_ROOT)\bin\tao_idl and ..\..\..\bin\opendds_idl on Mri.idl"</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MriC.cpp;MriC.h;MriC.inl;MriS.cpp;MriS.h;MriTypeSupport.idl;MriTypeSupportImpl.cpp;MriTypeSupportImpl.h</Outputs>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\..\..\bin\opendds_idl.exe;..\..\..\dds\idl\IDLTemplate.txt;$(ACE_ROOT)\bin\tao_idl.exe;$(ACE_ROOT)\lib\TAO_IDL_BE.dll;$(ACE_ROOT)\lib\TAO_IDL_FE.dll</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ACE_ROOT)\bin\tao_idl.exe;..\..\..\bin\opendds_idl.exe;..\..\..\dds\idl\IDLTemplate.txt;$(ACE_ROOT)\lib\TAO_IDL_BE.dll;$(ACE_ROOT)\lib\TAO_IDL_FE.dll</AdditionalInputs>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>

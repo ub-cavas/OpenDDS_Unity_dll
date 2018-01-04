@@ -28,8 +28,8 @@
 // TAO_IDL - Generated from
 // be\be_codegen.cpp:152
 
-#ifndef _TAO_IDL_MRIC_SPP6NP_H_
-#define _TAO_IDL_MRIC_SPP6NP_H_
+#ifndef _TAO_IDL_MRIC_U2KYCF_H_
+#define _TAO_IDL_MRIC_U2KYCF_H_
 
 #include /**/ "ace/pre.h"
 
