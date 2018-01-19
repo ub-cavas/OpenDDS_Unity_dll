@@ -23,7 +23,7 @@ using std::cout;
 using std::endl;
 using std::string;
 
-extern QueueTs<Mri::V2XMessage> v2x_queue;
+extern QueueTs<Mri::V2XMessage> v2x_queue_in;
 
 
 void
@@ -50,7 +50,7 @@ DataReaderListenerImpl_V2XMessage::on_data_available(DDS::DataReader_ptr reader)
 		//cout << "SampleInfo.instance_state = " << info.instance_state << endl;
 
 		if (info.valid_data) {
-			v2x_queue.push(v2x_message);
+			v2x_queue_in.push(v2x_message);
 		}
 
 	}

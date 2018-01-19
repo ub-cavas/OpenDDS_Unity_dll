@@ -21,7 +21,7 @@ using std::cout;
 using std::endl;
 using std::string;
 
-extern QueueTs<Mri::VehData> vehdata_queue;
+extern QueueTs<Mri::VehData> vehdata_queue_in;
 
 
 void
@@ -48,7 +48,7 @@ DataReaderListenerImpl_VehData::on_data_available(DDS::DataReader_ptr reader)
 		//cout << "SampleInfo.instance_state = " << info.instance_state << endl;
 
 		if (info.valid_data) {
-			vehdata_queue.push(veh_message);			
+			vehdata_queue_in.push(veh_message);			
 		}
 
 	}
@@ -58,30 +58,6 @@ DataReaderListenerImpl_VehData::on_data_available(DDS::DataReader_ptr reader)
 			ACE_TEXT(" take_next_sample failed!\n")));
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -122,9 +98,9 @@ DataReaderListenerImpl_VehData::on_subscription_matched(
 	DDS::DataReader_ptr /*reader*/,
 	const DDS::SubscriptionMatchedStatus& /*status*/)
 {
-	cout << "******************     Subscriber connected    **************************" << endl;
-	cout << "******************                             **************************" << endl;
-	cout << "******************      Press 'q' to finish    **************************" << endl << endl;
+	cout << "******************        VehData                 **************************" << endl;
+	cout << "******************        Subscriber changed      **************************" << endl;
+	cout << "******************                                **************************" << endl << endl;
 }
 void
 DataReaderListenerImpl_VehData::on_sample_lost(

@@ -22,6 +22,8 @@ long timestamp_master;
 long stepsCounter = 0;
 long delaySum = 0;
 
+
+
 void TimestampThread()
 {
 	// master timestamp
@@ -61,6 +63,7 @@ void AddNextDelay(Mri::Aux2Strings auxMessage, long timestampNow) {
 
 		std::cout  << "TIMESTAMP SYNCHRONIZED" << "  " << std::endl << std::endl;
 		
+	
 		
 
 		//clean-up
