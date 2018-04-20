@@ -8,7 +8,7 @@
 #include <ctime> //time format
 #include <conio.h> //key press
 #include <map>	//map - list of vehicles
-
+#include <atomic> //access
 
 
 
@@ -18,10 +18,17 @@
 #include "DataReader_V2XMessage.h"
 #include "DataWriter_V2XMessage.h"
 #include "DataReader_VehData.h"
+#include "DataWriter_VehData.h"
+
+
+#include "ParticipantClass.h"
+#include "SubscriberClass.h"
+#include "PublisherClass.h"
 
 #include "QueueTs.h"
 #include "TimeSync.h"
 #include "OpenDDS.h"
+#include "Start.h"
 
 using std::cerr;
 using std::cout;
@@ -31,10 +38,19 @@ using std::string;
 
 Mri::Aux2StringsDataWriter_var  writer_global_aux2strings;
 Mri::V2XMessageDataWriter_var  writer_global_v2xmessage;
+Mri::VehDataDataWriter_var writer_global_vehdata;
 long veh_id_to_remove;
 
 QueueTs<Mri::VehData> vehdata_queue_in;
+Mri::VehData subjectCar;
+
 std::map<long, Mri::VehData> vehs_map;
+std::map<long, UnityVehicle> unityVehsMap;
+
+std::map<long, std::set<UnityVehicle>> unityVehsMapSets;
+std::atomic<int> access_unityVehMapSets;
+
+
 
 //std::queue<Mri::V2XMessage> v2x_queue_in;
 QueueTs<Mri::V2XMessage> v2x_queue_in;
@@ -50,61 +66,181 @@ long sample_counter_per_timestamp;	//used by generateV2xUniqueTimestamp
 
 
 
-void vehsMapThread() {
-	
+
+
+std::string log_rd_VehsMapThread;
+std::string log_rd_Opendds;
+
+
+
+void convertUnityVeh(Mri::VehData* veh, UnityVehicle* uVeh) {
+	//no copy strings
+
+	uVeh->color = veh->color;
+	uVeh->lane_index = veh->lane_index;
+	uVeh->leading_vehicle_id = veh->leading_vehicle_id;
+	uVeh->link_coordinate = veh->link_coordinate;
+	uVeh->link_id = veh->link_id;
+	uVeh->orient_heading = veh->orient_heading;
+	uVeh->orient_pitch = veh->orient_pitch;
+	uVeh->orient_roll = veh->orient_roll;
+	uVeh->position_x = veh->position_x;
+	uVeh->position_y = veh->position_y;
+	uVeh->position_z = veh->position_z;
+	uVeh->speed = veh->speed;
+	uVeh->timestamp = veh->timestamp;
+	uVeh->trailing_vehicle_id = veh->trailing_vehicle_id;
+	uVeh->turning_indicator = veh->turning_indicator;
+	uVeh->vehicle_id = veh->vehicle_id;
+	uVeh->vehicle_type = veh->vehicle_type;
+
+}
+
+
+
+void publishSubjectCarLocationThread() {
 
 	Mri::VehData _veh;
+
+
+	std::chrono::time_point<std::chrono::system_clock> t = std::chrono::system_clock::now();	//sleep below
+
+	while (!finish_application) {
+
+		_veh = getSubjectCarPosition();
+		_veh.timestamp = GetTimestamp();
+
+		publishVehDataMessage(_veh);
+
+		t += std::chrono::milliseconds(50);	//each loop 50 ms
+		std::this_thread::sleep_until(t);
+	}
+
+	cout << endl << "-------------------" << endl << "-  publishSubjectCarThread Stopped " << endl << "-------------------" << endl << endl;
+}
+
+
+Mri::VehData getSubjectCarPosition() {
+	return subjectCar;
+}
+
+
+void unityVehsMapThread() {
+
+
+	Mri::VehData _veh;
+
+	UnityVehicle _uVeh;
+
 	
+
+
 	//std::map<long, Mri::VehData> vehs_map;
-	std::map<long, Mri::VehData>::iterator it;
-	
-	veh_id_to_remove = -1; // initial value
-	
-	while (!finish_application)
+	//std::map<long, UnityVehicle>::iterator it;
+	std::map<long, std::set<UnityVehicle>>::iterator it;
+
+	try
 	{
-		//wait for something at the queue
-		vehdata_queue_in.pop(_veh);
+		veh_id_to_remove = -1; // initial value
+
+		while (!finish_application)
 		{
-			it = vehs_map.find(_veh.vehicle_id);
-			if (it != vehs_map.end()) {
-				//there is a car with id = _veh.vehicle_id
+			//wait for something at the queue
+			vehdata_queue_in.pop(_veh);
+			{
+				log_rd_VehsMapThread = "Start after queue pop,";
+
+				while (access_unityVehMapSets != ACCESS_none) {             // wait while getVehsArray accessing VehMapSets
+					
+					if (access_unityVehMapSets == ACCESS_request_getVehsArray)
+					{
+						//it has a priority, change access
+						access_unityVehMapSets = ACCESS_getVehsArray;
+					}
+					
+					std::this_thread::yield();
+				}
+
+				access_unityVehMapSets = ACCESS_unityVehsMapThread;
+
+				log_rd_VehsMapThread += " GOT Access,";
+				
+				
+				
+				it = unityVehsMapSets.find(_veh.vehicle_id);
 
 
-				//check if new data is older than in vehs_map
-				if (_veh.timestamp >  it->second.timestamp)
-				{
-					//update data in vehs_map
-					vehs_map[it->first] = _veh;
+				log_rd_VehsMapThread += " find,";
+
+
+
+				if (it != unityVehsMapSets.end()) {
+					//there is a car with id = _veh.vehicle_id
+
+					convertUnityVeh(&_veh, &_uVeh);
+
+					//add to set
+					it->second.emplace(_uVeh);
+					//cout << "Timestamp=" << GetTimestamp() << " veh timestamp=" << _veh.timestamp << endl;
 				}
 				else
 				{
-					cout << "OpenDDS data is older than data in vehs_list. Veh_id=" << _veh.vehicle_id
-						<< " timestamp_vehs_list=" << it->second.timestamp
-						<< " timestamp_OpenDDS=" << _veh.timestamp << endl;
+					//no car with id = _veh.vehicle_id
+					//add new set to the map
+
+					//convert from _veh to _uVeh
+					convertUnityVeh(&_veh, &_uVeh);
+
+					std::set<UnityVehicle> _set;
+					_set.emplace(_uVeh);
+					unityVehsMapSets.emplace(_veh.vehicle_id, _set);
+					//cout << "NEW VEH Timestamp=" << GetTimestamp() << " veh timestamp=" << _veh.timestamp << endl;
+
+					cout << "++++ ++++ NEW VEH = " << _veh.vehicle_id << " ++++ ++++" << endl << endl;
+
 				}
-			}
-			else
-			{
-				//no car with id = _veh.vehicle_id
-				vehs_map.emplace(_veh.vehicle_id, _veh);
 
-			}
-
-			//check if we have to remove a car
-			if (veh_id_to_remove!=-1)
-			{
-				it = vehs_map.find(veh_id_to_remove);
-				if (it != vehs_map.end()) 
+				//check if we have to remove a car
+				if (veh_id_to_remove != -1)
 				{
-					vehs_map.erase(it);
-					cout << endl << "####################################################################################" << endl;
-					cout << "############  Removed from vehsMap vehicle_id =" << veh_id_to_remove << "     ############" << endl<<endl;
-					veh_id_to_remove = -1; //reset this variable
-				}
-			}
+					log_rd_VehsMapThread += " before find in check remove,";
 
+					it = unityVehsMapSets.find(veh_id_to_remove);
+					if (it != unityVehsMapSets.end())
+					{
+						unityVehsMapSets.erase(it);
+						//cout << endl << "####################################################################################" << endl;
+						cout << "############  Removed from vehsMap vehicle_id =" << veh_id_to_remove << "     ############" << endl << endl;
+						veh_id_to_remove = -1; //reset this variable
+
+						log_rd_VehsMapThread += " after Erase";
+					}
+				}
+
+
+				//check if other thread want to access unityVehsMapSets
+				
+					if (access_unityVehMapSets == ACCESS_request_getVehsArray)
+					{	
+						//it has a priority, change access
+						access_unityVehMapSets = ACCESS_getVehsArray;
+					}
+					else
+					{
+						access_unityVehMapSets = ACCESS_none;
+					}
+
+
+			}
 		}
 	}
+	catch (const std::exception&)
+	{
+		cout << "ERROR" << endl;
+		access_unityVehMapSets = ACCESS_none;
+	}
+
+	
 }
 
 
@@ -115,7 +251,7 @@ void vehsMapThread() {
 
 
 void OpenDDSThread(int argc, char* argv[]){
-	// start thread
+	// start_opendds thread
 	
 
 
@@ -128,13 +264,59 @@ void OpenDDSThread(int argc, char* argv[]){
 	
 	//initial value
 	timestamp_previous = 0;	
+
+	access_unityVehMapSets = ACCESS_none;
 	
 
+	//________________________________________________________
+	//initialization
+	subjectCar.vehicle_id = 1;
+	subjectCar.position_x = 0;
+	subjectCar.position_y = 0;
+	subjectCar.position_z = 0;
+	subjectCar.orient_heading = 0;
+	subjectCar.orient_pitch = 0;
+	subjectCar.orient_roll = 0;
+	subjectCar.speed = 0;
+	subjectCar.timestamp = 0;
+	
+	std::cout << "*******^^^^^^^^*  Starting openddsThread *********" << std::endl;
 
 	try
 	{
-		std::thread threadTimestamp(TimestampThread);
+
+
+		//std::thread threadTimestamp(TimestampThread);
+		
+		
+		
+		
+		
 		//std::cout << "*****************   Timestamp: " << GetTimestamp() << std::endl << std::endl;
+
+
+
+
+		//it helps a lot !!!!!
+		ACE::init();
+		
+		/*It was a following error :
+
+		ACE_INET_Addr::ACE_INET_Addr : localhost : WSA Startup not initialized
+			notification pipe open failed : WSA Startup not initialized
+			ACE_INET_Addr::ACE_INET_Addr : localhost : WSA Startup not initialized
+			notification pipe open failed : WSA Startup not initialized
+			ACE_Select_Reactor_T::open failed inside ACE_Select_Reactor_T::CTOR : WSA Startup
+			not initialized*/
+
+
+
+
+
+
+
+
+
 
 		// Initialize DomainParticipantFactory
  		DDS::DomainParticipantFactory_var dpf =
@@ -189,15 +371,19 @@ void OpenDDSThread(int argc, char* argv[]){
 		// topics:	Mri_TrafficVeh Mri_SubjectCar
 		//WARNING: both readers uses the same "on_data_available" code in DataReaderListenerImpl_VehData
 		//we can do this, because formats of the messages are the same
+
+		cout << "Create reader_traffic..." << endl;
 		DataReader_VehData reader_traffic_vehs(participant, subscriber, "Mri_TrafficVeh");
-		DataReader_VehData reader_subject_car(participant, subscriber, "Mri_SubjectCar");
 
-		// writer
-		DataWriter_V2XMessage writer_v2xMessage(participant, publisher, "Mri_V2XfromNS3");
-		writer_global_v2xmessage = writer_v2xMessage.msg_writer;
+		//subjec Car writer
+		cout << "Create writer_subjectCar..." << endl;
+		DataWriter_VehData writer_vehdata_message(participant, publisher, "Mri_SubjectCar");
+		writer_global_vehdata = writer_vehdata_message.msg_writer;
 
-		//create reader to receive V2X message  Mri_V2XfromNS3  Mri_V2XtoNS3
-		DataReader_V2XMessage reader_v2xmessage(participant, subscriber, "Mri_V2XtoNS3");
+
+		//DataReader_VehData reader_subject_car(participant, subscriber, "Mri_SubjectCar");
+
+		// 
 		
 
 		
@@ -205,36 +391,73 @@ void OpenDDSThread(int argc, char* argv[]){
 
 
 		long old_veh_timestamp = 0;
-		std::map<long, Mri::VehData> vehs_map_copy;
+		//std::map<long, Mri::VehData> vehs_map_copy;
+
+		std::map<long, UnityVehicle> unity_vehs_map_copy;
+
 		
 		threadOpenDDS_initialized = true;
 
 		//----------------------------------------------------------------------------------------------------------
 
 
+		cout << "It's time for loop..." << endl;
+
 		//while (key != 'q')
-		while (true)
+		while (!finish_application)
 		{	
 			//getInput(&key);
 
 			Sleep(100);
+			log_rd_Opendds = "After sleep, ";
 			// if info about veh wasn't updated for 500 ms it means this vehicle dissapeared, so we have to delete info about this vehicle
 			old_veh_timestamp = GetTimestamp() - 50;	//to find veh data not updated for 50 x 10ms = 500 ms
-			if (vehs_map.size() > 0)
-			{
-				vehs_map_copy = vehs_map;
+			
+			std::map<long, std::set<UnityVehicle>> unityVehsMapSetsCopy2;
+			log_rd_Opendds += " before copy to Copy2, ";
 
-				for (auto& x : vehs_map_copy) {
-					if (x.second.timestamp < old_veh_timestamp)
-					{
-						//select this veh_id to removing
-						veh_id_to_remove = x.second.vehicle_id;
 
-					}
-					//std::cout << "timestamp=" << x.second.timestamp << " veh_id=" << x.second.vehicle_id << " x=" << x.second.position_x << " y=" << x.second.position_y << std::endl;
-				}
-				//std::cout << std::endl << std::endl;
+			while (access_unityVehMapSets != ACCESS_none) {
+				std::this_thread::yield();
 			}
+
+			
+				unityVehsMapSetsCopy2 = unityVehsMapSets;
+			
+
+			
+			
+
+			log_rd_Opendds += " after copy to Copy2, ";
+														
+														
+			if (unityVehsMapSetsCopy2.size() > 0) {
+				
+				try
+				{
+					old_veh_timestamp = GetTimestamp() - 100;	//to find veh data not updated for 100 x 10ms = 1000 ms
+					log_rd_Opendds += " before auto, ";
+					for (auto x : unityVehsMapSetsCopy2)
+					{
+						std::set<UnityVehicle>::reverse_iterator it = x.second.rbegin();
+						if (it != x.second.rend())
+						{
+							if (it->timestamp < old_veh_timestamp)
+							{
+								veh_id_to_remove = x.first;
+								std::cout << "&&&&&&&&&&&&&  REMOVE id=" << veh_id_to_remove <<std::endl << std::endl;
+								break;
+							}
+						}
+					}
+				}
+				catch (const std::exception&)
+				{
+					cout << "ERROR main loop " << endl;
+				}
+				
+			}
+														
 		}
 
 		
@@ -242,13 +465,18 @@ void OpenDDSThread(int argc, char* argv[]){
 
 		//-------------------------------------------------------------------------------------------------
 		// Clean-up!
+
+		//threadTimestamp.detach();
+
 		participant->delete_contained_entities();
 		dpf->delete_participant(participant);
 
-		TheServiceParticipant->shutdown();
+		//TheServiceParticipant->shutdown();
 		
-		threadTimestamp.detach();
+		
 		finish_application = true; 
+
+		cout << endl << "$$$$$$$$$$$$$$$$$$$$$$" << endl << "$        End of OpenDDS thread" << endl << "$$$$$$$$$$$$$$$$$$$$$$" << endl << endl;
 		
 	}
 	catch (const CORBA::Exception& e) {
@@ -302,7 +530,7 @@ void addV2xToMap(long extended_timestamp, Mri::V2XMessage v2x) {
 
 void transmitV2X(Mri::V2XMessage v2x, long destination_veh_id) {
 
-	const double V2X_RANGE = 150.0; //150 meters
+	const double V2X_RANGE = 300.0; //150 meters
 
 	try
 	{
@@ -349,13 +577,25 @@ void transmitV2X(Mri::V2XMessage v2x, long destination_veh_id) {
 
 }
 
-
+void publishVehDataMessage(Mri::VehData car) {
+	int success = writer_global_vehdata->write(car, DDS::HANDLE_NIL);
+	if (success == DDS::RETCODE_OK)
+	{
+		//std::cout << "Send SubjectCar position x=" << car.position_x << ", y=" << car.position_y << ", z=" << car.position_z << ", timestamp=" << car.timestamp << std::endl;
+	}
+	else
+	{
+		throw std::string("ERROR: DataWriter VehData::sendMessage write");
+		//ACE_ERROR((LM_ERROR, ACE_TEXT("(%P|%t) ERROR: Publisher::sendMessage write returned %d.\n"), success));
+	}
+}
 
 
 void publishV2xMessage(Mri::V2XMessage v2x) {
 	int success =  writer_global_v2xmessage->write(v2x, DDS::HANDLE_NIL);
 	if (success == DDS::RETCODE_OK)
 	{
+		
 		std::cout << endl << "@@ RESEND V2X from veh_id:" << v2x.sender_id << " to veh_id:" << v2x.recipient_id << " timestamps: "
 			<< v2x.sender_timestamp << " -> " << v2x.recipient_timestamp << std::endl;
 	}
@@ -381,8 +621,65 @@ void publishV2xMessage(Mri::V2XMessage v2x) {
 
 
 
-
-
+//void vehsMapThread() {
+//	
+//
+//	Mri::VehData _veh;
+//	
+//	//std::map<long, Mri::VehData> vehs_map;
+//	std::map<long, Mri::VehData>::iterator it;
+//	
+//	veh_id_to_remove = -1; // initial value
+//	
+//
+//	std::cout << "***************   vehsMapThread " << std::endl;
+//
+//	while (!finish_application)
+//	{
+//		//wait for something at the queue
+//		vehdata_queue_in.pop(_veh);
+//		{
+//			it = vehs_map.find(_veh.vehicle_id);
+//			if (it != vehs_map.end()) {
+//				//there is a car with id = _veh.vehicle_id
+//
+//
+//				//check if new data is older than in vehs_map
+//				if (_veh.timestamp >  it->second.timestamp)
+//				{
+//					//update data in vehs_map
+//					vehs_map[it->first] = _veh;
+//				}
+//				else
+//				{
+//					cout << "OpenDDS data is older than data in vehs_list. Veh_id=" << _veh.vehicle_id
+//						<< " timestamp_vehs_list=" << it->second.timestamp
+//						<< " timestamp_OpenDDS=" << _veh.timestamp << endl;
+//				}
+//			}
+//			else
+//			{
+//				//no car with id = _veh.vehicle_id
+//				vehs_map.emplace(_veh.vehicle_id, _veh);
+//
+//			}
+//
+//			//check if we have to remove a car
+//			if (veh_id_to_remove!=-1)
+//			{
+//				it = vehs_map.find(veh_id_to_remove);
+//				if (it != vehs_map.end()) 
+//				{
+//					vehs_map.erase(it);
+//					cout << endl << "####################################################################################" << endl;
+//					cout << "############  Removed from vehsMap vehicle_id =" << veh_id_to_remove << "     ############" << endl<<endl;
+//					veh_id_to_remove = -1; //reset this variable
+//				}
+//			}
+//
+//		}
+//	}
+//}
 
 
 

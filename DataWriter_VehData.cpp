@@ -30,10 +30,6 @@ DataWriter_VehData::DataWriter_VehData(DDS::DomainParticipant_var participant, D
 }
 
 
-//DataWriter_VehData::DataWriter_VehData() {
-//
-//}
-
 DataWriter_VehData::~DataWriter_VehData()
 {
 }

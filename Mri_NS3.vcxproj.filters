@@ -28,9 +28,6 @@
     <ClCompile Include="DataWriter_Aux2Strings.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ParticipantClass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -67,6 +64,15 @@
     <ClCompile Include="OpenDDST.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Start.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DataReader_Aux2Strings.h">
@@ -76,9 +82,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DataWriter_Aux2Strings.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="main.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ParticipantClass.h">
@@ -121,6 +124,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="OpenDDS.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Start.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

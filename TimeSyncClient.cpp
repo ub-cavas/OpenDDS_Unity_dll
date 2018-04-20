@@ -18,9 +18,15 @@ using std::string;
 
 
 long timestamp_master;
+long elapsedMicrosecondsMaster;	//microseconds from last timestamp
+double beginMicrosecondsTicks;
 
 long stepsCounter = 0;
 long delaySum = 0;
+
+
+extern bool finish_application;
+
 
 
 
@@ -32,9 +38,10 @@ void TimestampThread()
 	timestamp_master = 0;
 	std::chrono::time_point<std::chrono::system_clock> t = std::chrono::system_clock::now();
 
-	while (true)
+	while (!finish_application)
 	{
 		timestamp_master += 1;
+		beginMicrosecondsTicks = startTimer();
 		t += std::chrono::milliseconds(10);
 		std::this_thread::sleep_until(t);
 	}
@@ -76,7 +83,14 @@ void AddNextDelay(Mri::Aux2Strings auxMessage, long timestampNow) {
 
 
 long GetTimestamp() {
+	elapsedMicrosecondsMaster = endTimer(beginMicrosecondsTicks);
 	return timestamp_master;
+}
+
+
+long GetElapsedMicroseconds()
+{
+	return elapsedMicrosecondsMaster;
 }
 
 void SetTimestamp(long timestamp_perfect) {
@@ -104,7 +118,7 @@ bool SendSyncMessage() {
 	}
 	//sender.sendMessage(auxMessage);
 
-	//std::cout << "Send timesync message at: " << GetTimestamp() << std::endl << std::endl;
+	std::cout << "Send timesync message at: " << GetTimestamp() << std::endl << std::endl;
 	return true;
 }
 
@@ -122,7 +136,7 @@ bool SynchronizeTime() {
 
 		SendSyncMessage();
 
-		Sleep(300);
+		Sleep(100);
 
 	}
 
@@ -165,4 +179,56 @@ void TimeSynchronization(DDS::DomainParticipant_var m_participant,DDS::Subscribe
 
 	//wait 2 sec to finish synchronization process and then dispose reader and sender
 	Sleep(2000);
+
+	cout << "END Timestamp Synchronization" << endl;
+}
+
+
+
+
+
+
+long long startTimer(void)
+{
+	LARGE_INTEGER retVal;
+
+	//reset value for this timestamp
+	elapsedMicrosecondsMaster = 0;
+
+
+	QueryPerformanceCounter(&retVal);
+	return retVal.QuadPart;
+}
+
+
+
+long endTimer(long long const & begin)
+{
+	LARGE_INTEGER end, frequency, elapsedMicroseconds;
+	QueryPerformanceCounter(&end);
+	QueryPerformanceFrequency(&frequency);
+
+	//example for microseconds
+	//LARGE_INTEGER StartingTime, EndingTime, ElapsedMicroseconds;
+	//LARGE_INTEGER Frequency;
+
+	//QueryPerformanceFrequency(&Frequency);
+	//QueryPerformanceCounter(&StartingTime);
+
+	// Activity to be timed
+	//QueryPerformanceCounter(&EndingTime);
+	//ElapsedMicroseconds.QuadPart = EndingTime.QuadPart - StartingTime.QuadPart;
+	//ElapsedMicroseconds.QuadPart *= 1000000;
+	//ElapsedMicroseconds.QuadPart /= Frequency.QuadPart;
+
+
+	elapsedMicroseconds.QuadPart = end.QuadPart - begin;
+	elapsedMicroseconds.QuadPart *= 1000000;
+	elapsedMicroseconds.QuadPart /= frequency.QuadPart;
+
+
+	//in seconds:
+	//return (double)(end.QuadPart - begin) / (double)frequency.QuadPart;
+
+	return (long)elapsedMicroseconds.QuadPart;
 }
