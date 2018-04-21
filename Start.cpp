@@ -42,7 +42,8 @@ extern std::map<long, UnityVehicle> unityVehsMap;
 extern std::map<long, std::set<UnityVehicle>> unityVehsMapSets;
 extern std::atomic<int> access_unityVehMapSets;
 
-
+extern std::atomic<float> dnpw_closestVehicleMessage_distance;
+extern std::atomic<long> dnpw_closestVehicleMessage_timestamp;
 
 
 extern Mri::VehData subjectCar;
@@ -107,14 +108,15 @@ void getVehsArray(int* Num_Vehicles, UnityVehicle** unityVehicleData) {
 
 	while (access_unityVehMapSets != ACCESS_none && access_unityVehMapSets != ACCESS_getVehsArray) {             // wait while getVehsArray accessing VehMapSets
 		
-		std::this_thread::yield();
+		//std::this_thread::yield();
+		log_rd = "a";
 	}
 
 	access_unityVehMapSets = ACCESS_getVehsArray;
 
 	try
 	{
-		if (unityVehsMapSets.size()>0)
+		if (!unityVehsMapSets.empty())
 		{
 
 			long interpolate_timestamp = GetTimestamp() - 15;	//interpolate location of vehicle 15 x 10 ms = 150 ms ago
@@ -124,11 +126,11 @@ void getVehsArray(int* Num_Vehicles, UnityVehicle** unityVehicleData) {
 			//vehs_map_copy2 = unityVehsMapSets;
 
 			std::set<UnityVehicle> setUnityVehs;
+			long  key_mapUnityVehs;
 
 
 
-
-			log_rd += " before auto x";
+//			log_rd += " before auto x";
 
 
 
@@ -136,49 +138,58 @@ void getVehsArray(int* Num_Vehicles, UnityVehicle** unityVehicleData) {
 
 			//std::cout << "    interpolate timestamp=" << interpolate_timestamp << std::endl;
 
+
+			// during each getVehsArray we create new Map, and at the end we replace content of unityVehsMapSets
+			std::map<long, std::set<UnityVehicle>> unityVehsMapSets2;
+
 			for (auto& x : unityVehsMapSets) {
 
 				setUnityVehs = x.second;
+				key_mapUnityVehs = x.first;
 
-
-				log_rd = "START, go to interpolate";
+//				log_rd = "START, go to interpolate";
 				
-				
+			
 				
 				
 				UnityVehicle uVeh = interpolateVehPosition(&setUnityVehs, interpolate_timestamp, elapsedMicrosecondsFromLastTimeSTamp);
 
 
-				log_rd += ", after interpolate, indx=";
-				log_rd += std::to_string(indx);
+				//log_rd += ", after interpolate, indx=";
+				//log_rd += std::to_string(indx);
 
 				// vehicle_id!=-1 means we couldn't get interpolated location of vehicle
-				if (uVeh.vehicle_id != -1)
+				if (uVeh.vehicle_id > -1)
 				{
 					unityVehArray[indx] = uVeh;
 					indx++;
 
-					// update map
-					x.second = setUnityVehs;
+					// update a new map
+					//x.second = setUnityVehs;
 
-					log_rd += ", after update map";
+					unityVehsMapSets2.emplace(key_mapUnityVehs, setUnityVehs);
+
+//					log_rd += ", after update map";
 				}
-
-
-
-
+				else
+				{
+					unityVehsMapSets2.emplace(x.first, x.second);
+				}
 
 				//std::cout << x.second.timestamp << "   vehId:" << x.second.vehicle_id << std::endl;
 
 			}
 
+			unityVehsMapSets.swap(unityVehsMapSets2);
+
+
 			*unityVehicleData = unityVehArray;
 			*Num_Vehicles = indx;
 
-			log_rd += ", almost end, indx=";
-			log_rd += std::to_string(indx);
+			//log_rd += ", almost end, indx=";
+			//log_rd += std::to_string(indx);
 
-			std::cout << "------------------------------------------------------num vehs=" << indx << std::endl;
+			//std::cout << "------------------------------------------------------num vehs=" << indx << std::endl;
 
 		}
 
@@ -220,7 +231,7 @@ UnityVehicle interpolateVehPosition(std::set<UnityVehicle> *  _set, long x_times
 
 	if (setSize >= 4)
 	{
-
+		
 		//std::cout << ' ' << it.;
 		try
 		{
@@ -231,7 +242,7 @@ UnityVehicle interpolateVehPosition(std::set<UnityVehicle> *  _set, long x_times
 
 					uNext = *it;
 
-					log_rd += ", before lerp";
+					//log_rd += ", before lerp";
 
 					//check if it is no beginning of the set
 					if (it != _set->begin())
@@ -248,7 +259,7 @@ UnityVehicle interpolateVehPosition(std::set<UnityVehicle> *  _set, long x_times
 								it--;
 								_set->erase(_set->begin(), it);
 								//std::cout << "%%set......" << std::endl << std::endl;
-								log_rd += ", after erase";
+								//log_rd += ", after erase";
 							}
 
 						}
@@ -536,6 +547,20 @@ void stop_opendds() {
 	
 	
 }
+
+
+long GetDnpwDistance()
+{
+	long _distance = dnpw_closestVehicleMessage_distance;
+
+	//after reading data -> reset data
+	/*dnpw_closestVehicleMessage_distance = 99999;
+	dnpw_closestVehicleMessage_timestamp = 0;*/
+
+	return _distance;
+}
+
+
 
 int  getR() {
 

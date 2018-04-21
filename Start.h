@@ -47,6 +47,8 @@ extern "C" RDTest void start_opendds();
 
 extern "C" RDTest void stop_opendds();
 
+
+
 //extern "C" RDTest void getVehs();
 
 extern "C" RDTest int getR();
@@ -56,6 +58,8 @@ extern "C" RDTest int getD();
 extern "C" RDTest void getVehsArray(int * Num_Vehicles, UnityVehicle ** VehicleData);
 
 extern "C" RDTest void updateSubjectCarLocation(long veh_id, float pos_x, float pos_y, float pos_z, float heading, float pitch, float roll);
+
+extern "C" RDTest long GetDnpwDistance();
 
 
 //UnityVehicle interpolateVehPosition(std::set<UnityVehicle>* _set, long x_timestamp);

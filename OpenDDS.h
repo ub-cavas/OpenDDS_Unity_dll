@@ -5,7 +5,9 @@
 #include "Start.h"
 
 
-void convertUnityVeh(Mri::VehData * veh, UnityVehicle * uVeh);
+//void convertUnityVeh(Mri::VehData * veh, UnityVehicle * uVeh);
+
+UnityVehicle convertUnityVeh(Mri::VehData veh);
 
 void publishSubjectCarLocationThread();
 
@@ -30,6 +32,8 @@ void transmitV2X(Mri::V2XMessage v2x, long destination_veh_id);
 void publishVehDataMessage(Mri::VehData car);
 
 void publishV2xMessage(Mri::V2XMessage v2x);
+
+void ProcessDoNotPassWarningMessage(Mri::Aux2Strings dnpwAux);
 
 
 

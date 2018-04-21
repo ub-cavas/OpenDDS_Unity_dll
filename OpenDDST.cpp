@@ -64,8 +64,8 @@ long timestamp_previous;			//used by generateV2xUniqueTimestamp
 long sample_counter_per_timestamp;	//used by generateV2xUniqueTimestamp
 
 
-
-
+std::atomic<float> dnpw_closestVehicleMessage_distance;
+std::atomic<long> dnpw_closestVehicleMessage_timestamp;
 
 
 std::string log_rd_VehsMapThread;
@@ -73,7 +73,36 @@ std::string log_rd_Opendds;
 
 
 
-void convertUnityVeh(Mri::VehData* veh, UnityVehicle* uVeh) {
+UnityVehicle  convertUnityVeh(Mri::VehData veh) {
+	//no copy strings
+
+	UnityVehicle uVeh;
+
+	uVeh.color = veh.color;
+	uVeh.lane_index = veh.lane_index;
+	uVeh.leading_vehicle_id = veh.leading_vehicle_id;
+	uVeh.link_coordinate = veh.link_coordinate;
+	uVeh.link_id = veh.link_id;
+	uVeh.orient_heading = veh.orient_heading;
+	uVeh.orient_pitch = veh.orient_pitch;
+	uVeh.orient_roll = veh.orient_roll;
+	uVeh.position_x = veh.position_x;
+	uVeh.position_y = veh.position_y;
+	uVeh.position_z = veh.position_z;
+	uVeh.speed = veh.speed;
+	uVeh.timestamp = veh.timestamp;
+	uVeh.trailing_vehicle_id = veh.trailing_vehicle_id;
+	uVeh.turning_indicator = veh.turning_indicator;
+	uVeh.vehicle_id = veh.vehicle_id;
+	uVeh.vehicle_type = veh.vehicle_type;
+
+	return uVeh;
+
+}
+
+
+
+void convertUnityVehOld(Mri::VehData* veh, UnityVehicle* uVeh) {
 	//no copy strings
 
 	uVeh->color = veh->color;
@@ -137,10 +166,11 @@ void unityVehsMapThread() {
 
 	//std::map<long, Mri::VehData> vehs_map;
 	//std::map<long, UnityVehicle>::iterator it;
-	std::map<long, std::set<UnityVehicle>>::iterator it;
+	
 
 	try
 	{
+		std::map<long, std::set<UnityVehicle>>::iterator it;
 		veh_id_to_remove = -1; // initial value
 
 		while (!finish_application)
@@ -159,6 +189,7 @@ void unityVehsMapThread() {
 					}
 					
 					std::this_thread::yield();
+					//log_rd_VehsMapThread += " ddddd,";
 				}
 
 				access_unityVehMapSets = ACCESS_unityVehsMapThread;
@@ -177,7 +208,8 @@ void unityVehsMapThread() {
 				if (it != unityVehsMapSets.end()) {
 					//there is a car with id = _veh.vehicle_id
 
-					convertUnityVeh(&_veh, &_uVeh);
+					_uVeh = convertUnityVeh(_veh);
+					//convertUnityVeh(&_veh, &_uVeh);
 
 					//add to set
 					it->second.emplace(_uVeh);
@@ -189,7 +221,8 @@ void unityVehsMapThread() {
 					//add new set to the map
 
 					//convert from _veh to _uVeh
-					convertUnityVeh(&_veh, &_uVeh);
+					_uVeh = convertUnityVeh(_veh);
+					//convertUnityVeh(&_veh, &_uVeh);
 
 					std::set<UnityVehicle> _set;
 					_set.emplace(_uVeh);
@@ -201,6 +234,24 @@ void unityVehsMapThread() {
 				}
 
 				//check if we have to remove a car
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+				// TEST
+
+
 				if (veh_id_to_remove != -1)
 				{
 					log_rd_VehsMapThread += " before find in check remove,";
@@ -209,13 +260,32 @@ void unityVehsMapThread() {
 					if (it != unityVehsMapSets.end())
 					{
 						unityVehsMapSets.erase(it);
-						//cout << endl << "####################################################################################" << endl;
+						cout << endl << "####################################################################################" << endl;
 						cout << "############  Removed from vehsMap vehicle_id =" << veh_id_to_remove << "     ############" << endl << endl;
 						veh_id_to_remove = -1; //reset this variable
 
 						log_rd_VehsMapThread += " after Erase";
 					}
 				}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 				//check if other thread want to access unityVehsMapSets
@@ -284,15 +354,6 @@ void OpenDDSThread(int argc, char* argv[]){
 
 	try
 	{
-
-
-		//std::thread threadTimestamp(TimestampThread);
-		
-		
-		
-		
-		
-		//std::cout << "*****************   Timestamp: " << GetTimestamp() << std::endl << std::endl;
 
 
 
@@ -385,23 +446,28 @@ void OpenDDSThread(int argc, char* argv[]){
 
 		// 
 		
-
+		// for reading dnpw v2x messages
+		dnpw_closestVehicleMessage_distance = 99999;	//initial value.  99999 means a vehicle is out of range
+		dnpw_closestVehicleMessage_timestamp = 0;
+		DataReader_Aux2Strings reader(participant, subscriber, "Mri_Control");
 		
 
 
 
 		long old_veh_timestamp = 0;
-		//std::map<long, Mri::VehData> vehs_map_copy;
 
-		std::map<long, UnityVehicle> unity_vehs_map_copy;
+		//std::map<long, UnityVehicle> unity_vehs_map_copy;
 
-		
 		threadOpenDDS_initialized = true;
+
+
+
+
 
 		//----------------------------------------------------------------------------------------------------------
 
 
-		cout << "It's time for loop..." << endl;
+		//cout << "It's time for loop..." << endl;
 
 		//while (key != 'q')
 		while (!finish_application)
@@ -409,39 +475,42 @@ void OpenDDSThread(int argc, char* argv[]){
 			//getInput(&key);
 
 			Sleep(100);
-			log_rd_Opendds = "After sleep, ";
-			// if info about veh wasn't updated for 500 ms it means this vehicle dissapeared, so we have to delete info about this vehicle
-			old_veh_timestamp = GetTimestamp() - 50;	//to find veh data not updated for 50 x 10ms = 500 ms
+			//log_rd_Opendds = "After sleep, ";	
 			
-			std::map<long, std::set<UnityVehicle>> unityVehsMapSetsCopy2;
-			log_rd_Opendds += " before copy to Copy2, ";
 
 
-			while (access_unityVehMapSets != ACCESS_none) {
-				std::this_thread::yield();
+			if (dnpw_closestVehicleMessage_distance != 99999);
+			{
+				long oldDistanceTimestamp = GetTimestamp() - 50;  //500 ms
+				if (dnpw_closestVehicleMessage_timestamp < oldDistanceTimestamp)
+				{
+					//old value, let's reset it
+					dnpw_closestVehicleMessage_distance = 99999;
+					dnpw_closestVehicleMessage_timestamp = 0;
+				}
+
 			}
 
-			
-				unityVehsMapSetsCopy2 = unityVehsMapSets;
-			
 
+			// if info about veh wasn't updated for 500 ms it means this vehicle dissapeared, so we have to delete info about this vehicle
+			old_veh_timestamp = GetTimestamp() - 150;	//to find veh data not updated for 50 x 10ms = 500 ms
 			
-			
-
-			log_rd_Opendds += " after copy to Copy2, ";
-														
-														
-			if (unityVehsMapSetsCopy2.size() > 0) {
-				
-				try
+			std::map<long, std::set<UnityVehicle>> unityVehsMapSetsCopy2;
+			try
 				{
-					old_veh_timestamp = GetTimestamp() - 100;	//to find veh data not updated for 100 x 10ms = 1000 ms
-					log_rd_Opendds += " before auto, ";
-					for (auto x : unityVehsMapSetsCopy2)
-					{
-						std::set<UnityVehicle>::reverse_iterator it = x.second.rbegin();
-						if (it != x.second.rend())
+
+				while (access_unityVehMapSets != ACCESS_none) {
+					std::this_thread::yield();
+				}
+
+			
+				unityVehsMapSetsCopy2 = unityVehsMapSets;											
+				if (!unityVehsMapSetsCopy2.empty()) {
+						for (auto x : unityVehsMapSetsCopy2)
 						{
+							std::set<UnityVehicle>::iterator it;		
+							it = x.second.end();
+							--it;
 							if (it->timestamp < old_veh_timestamp)
 							{
 								veh_id_to_remove = x.first;
@@ -449,16 +518,14 @@ void OpenDDSThread(int argc, char* argv[]){
 								break;
 							}
 						}
-					}
 				}
-				catch (const std::exception&)
-				{
-					cout << "ERROR main loop " << endl;
-				}
-				
 			}
-														
-		}
+
+			catch (const std::exception&)
+			{
+				cout << "ERROR main loop " << endl;
+			}
+	}
 
 		
 
@@ -607,7 +674,18 @@ void publishV2xMessage(Mri::V2XMessage v2x) {
 }
 
 
+void ProcessDoNotPassWarningMessage(Mri::Aux2Strings dnpwAux)
+{
+	float aux_distance = atof(dnpwAux.str1);
+	if (aux_distance < dnpw_closestVehicleMessage_distance)
+	{
+		//this vehicle is closer, we have to update
+		dnpw_closestVehicleMessage_distance = aux_distance;
+		dnpw_closestVehicleMessage_timestamp = GetTimestamp();
 
+		cout << "Warning distance=" << dnpw_closestVehicleMessage_distance << " at=" << dnpw_closestVehicleMessage_timestamp << endl;
+	}
+}
 
 
 

@@ -24,7 +24,8 @@ namespace test01csharp
         public extern static int getR();
 
         [DllImport("mri_opendds.dll", CallingConvention = CallingConvention.Cdecl)]
-        public extern static int getD();
+        public extern static int GetDnpwDistance();
+        //extern "C" RDTest long GetDnpwDistance();
 
 
         [DllImport("mri_opendds.dll", CallingConvention = CallingConvention.Cdecl)]
@@ -51,7 +52,7 @@ namespace test01csharp
         static extern bool FreeLibrary(IntPtr hModule);
 
 
-        private bool continueLoop;
+     
 
 
 
@@ -163,7 +164,7 @@ namespace test01csharp
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            continueLoop = false;
+           
         }
 
         void testDictionary ()
@@ -259,21 +260,36 @@ namespace test01csharp
         {
             //getVehs();
             UnityVehicle[] vehsData = new UnityVehicle[] { };
-            
 
-           
+            try
+            {
                 GetTrafficVehicles(out vehsData);
                 string t = "";
 
                 foreach (var item in vehsData)
                 {
                     t += "  timestamp: " + item.timestamp + "   vehId=" + item.vehicle_id + " x=" + item.position_x + " y=" + item.position_y + " heading: " + item.orient_heading + "\r\n";
-                
+
+                }
+                textBox1.Text = t;
+
+
+                updateSubjectCarLocation(1, 47f, -1340.28f, 0f, 3.14f, 0, 0);
+
+                int dnpwDistance = GetDnpwDistance();
+                label1.Text = dnpwDistance.ToString() + " m";
+
             }
-            textBox1.Text = t;
+            catch (Exception )
+            {
+                label1.Text = "ERROR";
+                timer1.Enabled = false;
+                Debug.Print("Error");
+                //throw ;
+            }
 
-
-            updateSubjectCarLocation(1, 47.22f, -1340.28f, 0f, 45f, 0, 0);
+           
+               
            
         }
 

@@ -10,6 +10,7 @@
 
 #include "TimeSync.h"
 #include "DataWriter_Aux2Strings.h"
+#include "OpenDDS.h"
 
 using std::cerr;
 using std::cout;
@@ -27,6 +28,9 @@ long delaySum = 0;
 
 extern bool finish_application;
 
+ 
+extern long dnpw_closestVehicleMessage_distance;  //store dnpw message from the closest vehicle, should be read by Unity every 200 ms
+extern long dnpw_closestVehicleMessage_timestamp;
 
 
 
@@ -158,8 +162,41 @@ bool ParseAux2Strings(Mri::Aux2Strings aux_message)
 
 		AddNextDelay(aux_message, GetTimestamp());
 		//std::cout << "Timestamp: " << GetTimestamp() << std::endl << std::endl;
+		return true;
+	}
+
+	//Do Not Pass Warning
+	if (strcmp(aux_message.tag, "dnpw") == 0) {
+		//Do Not Pass Warning
+		//long aux_distance = atol(aux_message.str1);
+		//if (aux_distance < dnpw_closestVehicleMessage_distance)
+		//{
+		//	//this vehicle is closer, we have to update
+		//	dnpw_closestVehicleMessage_distance = aux_distance;
+		//	dnpw_closestVehicleMessage_timestamp = GetTimestamp();
+		//}
+
+		ProcessDoNotPassWarningMessage(aux_message);
 
 	}
+
+
+	//sendDNPWMessage(float distance_meters, long receiverAppId) {
+
+	//	Mri::Aux2Strings auxMessage;
+	//	//long distance_feets = distance_meters / 3.28084;
+
+	//	std::string s = std::to_string((long)distance_meters);
+
+	//	auxMessage.receiverId = receiverAppId;
+	//	auxMessage.senderId = THIS_APP_ID;
+	//	auxMessage.tag = "dnpw";
+	//	auxMessage.str1 = s.c_str();
+	//	auxMessage.str2 = "";
+
+
+
+
 
 	return true;
 }

@@ -21,7 +21,7 @@ long long startTimer(void);
 long endTimer(long long const & begin);
 
 const std::string TAG_TIME_SYNC = "timesync";
-const long THIS_APP_ID = 16;
+const long THIS_APP_ID = 5;
 const long SERVER_ID = 1;
 
 extern Mri::Aux2StringsDataWriter_var  writer_global_aux2strings;
