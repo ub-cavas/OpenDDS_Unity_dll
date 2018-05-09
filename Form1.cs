@@ -24,7 +24,7 @@ namespace test01csharp
         public extern static int getR();
 
         [DllImport("mri_opendds.dll", CallingConvention = CallingConvention.Cdecl)]
-        public extern static int GetDnpwDistance();
+        public extern static float GetDnpwDistance();
         //extern "C" RDTest long GetDnpwDistance();
 
 
@@ -274,9 +274,9 @@ namespace test01csharp
                 textBox1.Text = t;
 
 
-                updateSubjectCarLocation(1, 47f, -1340.28f, 0f, 3.14f, 0, 0);
+                updateSubjectCarLocation(1, 47.5f, -1340.28f, 0f, -3.14f, 0, 0);
 
-                int dnpwDistance = GetDnpwDistance();
+                float dnpwDistance = GetDnpwDistance();
                 label1.Text = dnpwDistance.ToString() + " m";
 
             }

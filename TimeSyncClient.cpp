@@ -166,7 +166,7 @@ bool ParseAux2Strings(Mri::Aux2Strings aux_message)
 	}
 
 	//Do Not Pass Warning
-	if (strcmp(aux_message.tag, "dnpw") == 0) {
+	if (strcmp(aux_message.tag, TAG_DNPW.c_str()) == 0) {
 		//Do Not Pass Warning
 		//long aux_distance = atol(aux_message.str1);
 		//if (aux_distance < dnpw_closestVehicleMessage_distance)

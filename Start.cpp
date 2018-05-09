@@ -6,6 +6,7 @@
 #include <math.h>       // pow, sqrt
 #include <stdlib.h>     /* srand, rand */
 #include <atomic> //access
+#include <mutex>
 
 #include <dds/DCPS/Service_Participant.h>	//neccessary to start_opendds OpenDDSThreat without error
 #include "OpenDDS.h"	//to start_opendds OpenDDSThread
@@ -40,7 +41,10 @@ std::string log_rd;
 
 extern std::map<long, UnityVehicle> unityVehsMap;
 extern std::map<long, std::set<UnityVehicle>> unityVehsMapSets;
+
+
 extern std::atomic<int> access_unityVehMapSets;
+extern std::mutex mutexMap;
 
 extern std::atomic<float> dnpw_closestVehicleMessage_distance;
 extern std::atomic<long> dnpw_closestVehicleMessage_timestamp;
@@ -50,7 +54,7 @@ extern Mri::VehData subjectCar;
 extern QueueTs<Mri::VehData> vehdata_queue_in;
 
 
-extern long veh_id_to_remove;
+extern std::atomic<long> veh_id_to_remove;
 
 
 UnityVehicle unityVehArray[200];
@@ -94,25 +98,26 @@ UnityVehicle unityVehArray[200];
 
 void getVehsArray(int* Num_Vehicles, UnityVehicle** unityVehicleData) {
 
+	std::lock_guard<std::mutex> guard(mutexMap);
 
 	int indx = 0;
 	*Num_Vehicles = 0;
 	log_rd = "";
 
 
-	if (access_unityVehMapSets != ACCESS_none  && access_unityVehMapSets != ACCESS_getVehsArray)
-	{
-		//request for access
-		access_unityVehMapSets = ACCESS_request_getVehsArray;
-	}
+	//if (access_unityVehMapSets != ACCESS_none  && access_unityVehMapSets != ACCESS_getVehsArray)
+	//{
+	//	//request for access
+	//	access_unityVehMapSets = ACCESS_request_getVehsArray;
+	//}
 
-	while (access_unityVehMapSets != ACCESS_none && access_unityVehMapSets != ACCESS_getVehsArray) {             // wait while getVehsArray accessing VehMapSets
-		
-		//std::this_thread::yield();
-		log_rd = "a";
-	}
+	//while (access_unityVehMapSets != ACCESS_none && access_unityVehMapSets != ACCESS_getVehsArray) {             // wait while getVehsArray accessing VehMapSets
+	//	
+	//	//std::this_thread::yield();
+	//	log_rd = "a";
+	//}
 
-	access_unityVehMapSets = ACCESS_getVehsArray;
+	//access_unityVehMapSets = ACCESS_getVehsArray;
 
 	try
 	{
@@ -127,17 +132,6 @@ void getVehsArray(int* Num_Vehicles, UnityVehicle** unityVehicleData) {
 
 			std::set<UnityVehicle> setUnityVehs;
 			long  key_mapUnityVehs;
-
-
-
-//			log_rd += " before auto x";
-
-
-
-
-
-			//std::cout << "    interpolate timestamp=" << interpolate_timestamp << std::endl;
-
 
 			// during each getVehsArray we create new Map, and at the end we replace content of unityVehsMapSets
 			std::map<long, std::set<UnityVehicle>> unityVehsMapSets2;
@@ -186,10 +180,8 @@ void getVehsArray(int* Num_Vehicles, UnityVehicle** unityVehicleData) {
 			*unityVehicleData = unityVehArray;
 			*Num_Vehicles = indx;
 
-			//log_rd += ", almost end, indx=";
-			//log_rd += std::to_string(indx);
 
-			//std::cout << "------------------------------------------------------num vehs=" << indx << std::endl;
+			//std::cout << "---------------------------num vehs=" << indx << std::endl;
 
 		}
 
@@ -200,7 +192,7 @@ void getVehsArray(int* Num_Vehicles, UnityVehicle** unityVehicleData) {
 
 		}
 
-		access_unityVehMapSets = ACCESS_none;
+//		access_unityVehMapSets = ACCESS_none;
 		log_rd += ", END  ";
 		
 		
@@ -549,9 +541,9 @@ void stop_opendds() {
 }
 
 
-long GetDnpwDistance()
+float GetDnpwDistance()
 {
-	long _distance = dnpw_closestVehicleMessage_distance;
+	float _distance = dnpw_closestVehicleMessage_distance;
 
 	//after reading data -> reset data
 	/*dnpw_closestVehicleMessage_distance = 99999;

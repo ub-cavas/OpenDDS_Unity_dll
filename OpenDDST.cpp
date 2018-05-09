@@ -9,6 +9,7 @@
 #include <conio.h> //key press
 #include <map>	//map - list of vehicles
 #include <atomic> //access
+#include <mutex>
 
 
 
@@ -39,7 +40,7 @@ using std::string;
 Mri::Aux2StringsDataWriter_var  writer_global_aux2strings;
 Mri::V2XMessageDataWriter_var  writer_global_v2xmessage;
 Mri::VehDataDataWriter_var writer_global_vehdata;
-long veh_id_to_remove;
+std::atomic<long> veh_id_to_remove;
 
 QueueTs<Mri::VehData> vehdata_queue_in;
 Mri::VehData subjectCar;
@@ -49,6 +50,10 @@ std::map<long, UnityVehicle> unityVehsMap;
 
 std::map<long, std::set<UnityVehicle>> unityVehsMapSets;
 std::atomic<int> access_unityVehMapSets;
+
+std::mutex mutexMap;
+
+
 
 
 
@@ -159,7 +164,7 @@ void unityVehsMapThread() {
 
 	Mri::VehData _veh;
 
-	UnityVehicle _uVeh;
+//	UnityVehicle _uVeh;
 
 	
 
@@ -178,60 +183,64 @@ void unityVehsMapThread() {
 			//wait for something at the queue
 			vehdata_queue_in.pop(_veh);
 			{
-				log_rd_VehsMapThread = "Start after queue pop,";
+				//log_rd_VehsMapThread = "Start after queue pop,";
 
-				while (access_unityVehMapSets != ACCESS_none) {             // wait while getVehsArray accessing VehMapSets
-					
-					if (access_unityVehMapSets == ACCESS_request_getVehsArray)
-					{
-						//it has a priority, change access
-						access_unityVehMapSets = ACCESS_getVehsArray;
-					}
-					
-					std::this_thread::yield();
-					//log_rd_VehsMapThread += " ddddd,";
-				}
+				//while (access_unityVehMapSets != ACCESS_none) {             // wait while getVehsArray accessing VehMapSets
+				//	
+				//	if (access_unityVehMapSets == ACCESS_request_getVehsArray)
+				//	{
+				//		//it has a priority, change access
+				//		access_unityVehMapSets = ACCESS_getVehsArray;
+				//	}
+				//	
+				//	std::this_thread::yield();
+				//	//log_rd_VehsMapThread += " ddddd,";
+				//}
 
-				access_unityVehMapSets = ACCESS_unityVehsMapThread;
+				//access_unityVehMapSets = ACCESS_unityVehsMapThread;
 
-				log_rd_VehsMapThread += " GOT Access,";
+				//log_rd_VehsMapThread += " GOT Access,";
 				
 				
-				
-				it = unityVehsMapSets.find(_veh.vehicle_id);
-
-
-				log_rd_VehsMapThread += " find,";
+				addVehToMap(_veh);
 
 
 
-				if (it != unityVehsMapSets.end()) {
-					//there is a car with id = _veh.vehicle_id
+				//
+				//it = unityVehsMapSets.find(_veh.vehicle_id);
 
-					_uVeh = convertUnityVeh(_veh);
-					//convertUnityVeh(&_veh, &_uVeh);
 
-					//add to set
-					it->second.emplace(_uVeh);
-					//cout << "Timestamp=" << GetTimestamp() << " veh timestamp=" << _veh.timestamp << endl;
-				}
-				else
-				{
-					//no car with id = _veh.vehicle_id
-					//add new set to the map
+				//log_rd_VehsMapThread += " find,";
 
-					//convert from _veh to _uVeh
-					_uVeh = convertUnityVeh(_veh);
-					//convertUnityVeh(&_veh, &_uVeh);
 
-					std::set<UnityVehicle> _set;
-					_set.emplace(_uVeh);
-					unityVehsMapSets.emplace(_veh.vehicle_id, _set);
-					//cout << "NEW VEH Timestamp=" << GetTimestamp() << " veh timestamp=" << _veh.timestamp << endl;
 
-					cout << "++++ ++++ NEW VEH = " << _veh.vehicle_id << " ++++ ++++" << endl << endl;
+				//if (it != unityVehsMapSets.end()) {
+				//	//there is a car with id = _veh.vehicle_id
 
-				}
+				//	_uVeh = convertUnityVeh(_veh);
+				//	//convertUnityVeh(&_veh, &_uVeh);
+
+				//	//add to set
+				//	it->second.emplace(_uVeh);
+				//	//cout << "Timestamp=" << GetTimestamp() << " veh timestamp=" << _veh.timestamp << endl;
+				//}
+				//else
+				//{
+				//	//no car with id = _veh.vehicle_id
+				//	//add new set to the map
+
+				//	//convert from _veh to _uVeh
+				//	_uVeh = convertUnityVeh(_veh);
+				//	//convertUnityVeh(&_veh, &_uVeh);
+
+				//	std::set<UnityVehicle> _set;
+				//	_set.emplace(_uVeh);
+				//	unityVehsMapSets.emplace(_veh.vehicle_id, _set);
+				//	//cout << "NEW VEH Timestamp=" << GetTimestamp() << " veh timestamp=" << _veh.timestamp << endl;
+
+				//	cout << "++++ ++++ NEW VEH = " << _veh.vehicle_id << " ++++ ++++" << endl << endl;
+
+				//}
 
 				//check if we have to remove a car
 
@@ -254,17 +263,12 @@ void unityVehsMapThread() {
 
 				if (veh_id_to_remove != -1)
 				{
-					log_rd_VehsMapThread += " before find in check remove,";
 
-					it = unityVehsMapSets.find(veh_id_to_remove);
-					if (it != unityVehsMapSets.end())
+
+					if (removeVehFromMap()==0)
 					{
-						unityVehsMapSets.erase(it);
-						cout << endl << "####################################################################################" << endl;
+						//success
 						cout << "############  Removed from vehsMap vehicle_id =" << veh_id_to_remove << "     ############" << endl << endl;
-						veh_id_to_remove = -1; //reset this variable
-
-						log_rd_VehsMapThread += " after Erase";
 					}
 				}
 
@@ -290,15 +294,15 @@ void unityVehsMapThread() {
 
 				//check if other thread want to access unityVehsMapSets
 				
-					if (access_unityVehMapSets == ACCESS_request_getVehsArray)
-					{	
-						//it has a priority, change access
-						access_unityVehMapSets = ACCESS_getVehsArray;
-					}
-					else
-					{
-						access_unityVehMapSets = ACCESS_none;
-					}
+					//if (access_unityVehMapSets == ACCESS_request_getVehsArray)
+					//{	
+					//	//it has a priority, change access
+					//	access_unityVehMapSets = ACCESS_getVehsArray;
+					//}
+					//else
+					//{
+					//	access_unityVehMapSets = ACCESS_none;
+					//}
 
 
 			}
@@ -317,7 +321,70 @@ void unityVehsMapThread() {
 
 
 
+int removeVehFromMap() {
 
+	std::lock_guard<std::mutex> guard(mutexMap);
+
+	std::map<long, std::set<UnityVehicle>>::iterator it;
+	it = unityVehsMapSets.find(veh_id_to_remove);
+	
+	veh_id_to_remove = -1; //reset this global variable
+	
+	if (it != unityVehsMapSets.end())
+	{
+		unityVehsMapSets.erase(it);
+		return 0;
+	}
+	else
+	{
+		// can't find vehicle
+		return -1;
+	}
+}
+
+
+
+void addVehToMap(Mri::VehData _veh)
+{
+
+	std::lock_guard<std::mutex> guard(mutexMap);
+
+	UnityVehicle _uVeh;
+
+	std::map<long, std::set<UnityVehicle>>::iterator it;
+	it = unityVehsMapSets.find(_veh.vehicle_id);
+
+	//convert from veh to Unity Veh
+	_uVeh = convertUnityVeh(_veh);
+	//convertUnityVeh(&_veh, &_uVeh);
+
+	if (it != unityVehsMapSets.end()) {
+		//there is a car with id = _veh.vehicle_id
+
+		//add to set
+		it->second.emplace(_uVeh);
+		//cout << "Timestamp=" << GetTimestamp() << " veh timestamp=" << _veh.timestamp << endl;
+	}
+	else
+	{
+		//no car with id = _veh.vehicle_id
+		//add new set to the map
+
+		std::set<UnityVehicle> _set;
+		_set.emplace(_uVeh);
+		unityVehsMapSets.emplace(_veh.vehicle_id, _set);
+
+		cout << "++++ ++++ NEW VEH = " << _veh.vehicle_id << " ++++ ++++" << endl << endl;
+
+	}
+}
+
+
+
+
+
+
+//..........................................................................................................
 
 
 void OpenDDSThread(int argc, char* argv[]){
@@ -369,14 +436,6 @@ void OpenDDSThread(int argc, char* argv[]){
 			notification pipe open failed : WSA Startup not initialized
 			ACE_Select_Reactor_T::open failed inside ACE_Select_Reactor_T::CTOR : WSA Startup
 			not initialized*/
-
-
-
-
-
-
-
-
 
 
 		// Initialize DomainParticipantFactory
@@ -454,7 +513,7 @@ void OpenDDSThread(int argc, char* argv[]){
 
 
 
-		long old_veh_timestamp = 0;
+		//long old_veh_timestamp = 0;
 
 		//std::map<long, UnityVehicle> unity_vehs_map_copy;
 
@@ -479,7 +538,7 @@ void OpenDDSThread(int argc, char* argv[]){
 			
 
 
-			if (dnpw_closestVehicleMessage_distance != 99999);
+			if (dnpw_closestVehicleMessage_distance != 99999)
 			{
 				long oldDistanceTimestamp = GetTimestamp() - 50;  //500 ms
 				if (dnpw_closestVehicleMessage_timestamp < oldDistanceTimestamp)
@@ -492,39 +551,42 @@ void OpenDDSThread(int argc, char* argv[]){
 			}
 
 
-			// if info about veh wasn't updated for 500 ms it means this vehicle dissapeared, so we have to delete info about this vehicle
-			old_veh_timestamp = GetTimestamp() - 150;	//to find veh data not updated for 50 x 10ms = 500 ms
-			
-			std::map<long, std::set<UnityVehicle>> unityVehsMapSetsCopy2;
-			try
-				{
+			garbageCollectionMap();
 
-				while (access_unityVehMapSets != ACCESS_none) {
-					std::this_thread::yield();
-				}
 
-			
-				unityVehsMapSetsCopy2 = unityVehsMapSets;											
-				if (!unityVehsMapSetsCopy2.empty()) {
-						for (auto x : unityVehsMapSetsCopy2)
-						{
-							std::set<UnityVehicle>::iterator it;		
-							it = x.second.end();
-							--it;
-							if (it->timestamp < old_veh_timestamp)
-							{
-								veh_id_to_remove = x.first;
-								std::cout << "&&&&&&&&&&&&&  REMOVE id=" << veh_id_to_remove <<std::endl << std::endl;
-								break;
-							}
-						}
-				}
-			}
+			//// if info about veh wasn't updated for 500 ms it means this vehicle dissapeared, so we have to delete info about this vehicle
+			//old_veh_timestamp = GetTimestamp() - 50;	//to find veh data not updated for 50 x 10ms = 500 ms
+			//
+			//std::map<long, std::set<UnityVehicle>> unityVehsMapSetsCopy2;
+			//try
+			//	{
 
-			catch (const std::exception&)
-			{
-				cout << "ERROR main loop " << endl;
-			}
+			//	while (access_unityVehMapSets != ACCESS_none) {
+			//		std::this_thread::yield();
+			//	}
+
+			//
+			//	unityVehsMapSetsCopy2 = unityVehsMapSets;											
+			//	if (!unityVehsMapSetsCopy2.empty()) {
+			//			for (auto x : unityVehsMapSetsCopy2)
+			//			{
+			//				std::set<UnityVehicle>::iterator it;		
+			//				it = x.second.end();
+			//				--it;
+			//				if (it->timestamp < old_veh_timestamp)
+			//				{
+			//					veh_id_to_remove = x.first;
+			//					std::cout << "&&&&&&&&&&&&&  REMOVE id=" << veh_id_to_remove <<std::endl << std::endl;
+			//					break;
+			//				}
+			//			}
+			//	}
+			//}
+
+			//catch (const std::exception&)
+			//{
+			//	cout << "ERROR main loop " << endl;
+			//}
 	}
 
 		
@@ -555,7 +617,46 @@ void OpenDDSThread(int argc, char* argv[]){
 
 
 
+void garbageCollectionMap()
+{
 
+	std::lock_guard<std::mutex> guard(mutexMap);
+
+	// if info about veh wasn't updated for 500 ms it means this vehicle dissapeared, so we have to delete info about this vehicle
+	long old_veh_timestamp = GetTimestamp() - 50;	//to find veh data not updated for 50 x 10ms = 500 ms
+
+	std::map<long, std::set<UnityVehicle>> unityVehsMapSetsCopy2;
+	try
+	{
+
+	/*	while (access_unityVehMapSets != ACCESS_none) {
+			std::this_thread::yield();
+		}*/
+
+
+		unityVehsMapSetsCopy2 = unityVehsMapSets;
+		if (!unityVehsMapSetsCopy2.empty()) {
+			for (auto x : unityVehsMapSetsCopy2)
+			{
+				std::set<UnityVehicle>::iterator it;
+				it = x.second.end();
+				--it;
+				if (it->timestamp < old_veh_timestamp)
+				{
+					veh_id_to_remove = x.first;
+					std::cout << "&&&&&&&&&&&&&  REMOVE id=" << veh_id_to_remove << std::endl << std::endl;
+					break;
+				}
+			}
+		}
+	}
+
+	catch (const std::exception&)
+	{
+		cout << "ERROR main loop " << endl;
+	}
+
+}
 
 
 

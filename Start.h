@@ -59,7 +59,7 @@ extern "C" RDTest void getVehsArray(int * Num_Vehicles, UnityVehicle ** VehicleD
 
 extern "C" RDTest void updateSubjectCarLocation(long veh_id, float pos_x, float pos_y, float pos_z, float heading, float pitch, float roll);
 
-extern "C" RDTest long GetDnpwDistance();
+extern "C" RDTest float GetDnpwDistance();
 
 
 //UnityVehicle interpolateVehPosition(std::set<UnityVehicle>* _set, long x_timestamp);

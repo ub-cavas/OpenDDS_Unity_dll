@@ -15,9 +15,15 @@ Mri::VehData getSubjectCarPosition();
 
 void unityVehsMapThread();
 
+int removeVehFromMap();
+
+void addVehToMap(Mri::VehData _veh);
+
 //void vehsMapThread();
 
 void OpenDDSThread(int argc, char * argv[]);
+
+void garbageCollectionMap();
 
 
 

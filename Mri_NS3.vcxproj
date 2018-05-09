@@ -298,6 +298,7 @@
 -->
   </ItemDefinitionGroup>
   <ItemGroup>
+    <Midl Include="Mri.idl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DataReaderListenerImpl_Aux2Strings.cpp">

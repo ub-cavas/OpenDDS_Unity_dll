@@ -152,4 +152,7 @@
       <Filter>Inline Files</Filter>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <Midl Include="Mri.idl" />
+  </ItemGroup>
 </Project>
