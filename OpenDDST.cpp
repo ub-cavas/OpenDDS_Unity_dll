@@ -27,7 +27,7 @@
 #include "PublisherClass.h"
 
 #include "QueueTs.h"
-#include "TimeSync.h"
+#include "MriTimeSync.h"
 #include "OpenDDS.h"
 #include "Start.h"
 
@@ -482,11 +482,32 @@ void OpenDDSThread(int argc, char* argv[]){
 		}
 
 
-		
-		
-			// run timestamp synchronization
-		TimeSynchronization(participant, subscriber, publisher);
+		// run timestamp synchronization
+		if (!TimeSynchronization(participant, subscriber, publisher))
+		{
+			//there was a problem with time synchronization
+
+			cout << "####    THERE WAS A PROBLEM WITH TIMESTAMP SYNCHRONIZATION. PROGRAM WILL CLOSE...    ####" << endl;
+
+			// Clean-up!
+			participant->delete_contained_entities();
+			dpf->delete_participant(participant);
+
+			TheServiceParticipant->shutdown();
+
+			/*threadTimestamp.detach();*/
+
+
+			finish_application = true;
+			Sleep(5000);
+
+			exit(-1);
+
+
+
+		}
 		//Timestamps  synchronized !
+		cout << "Timestamp synchronized. t=" << GetTimestamp() << endl << endl;
 
 		// topics:	Mri_TrafficVeh Mri_SubjectCar
 		//WARNING: both readers uses the same "on_data_available" code in DataReaderListenerImpl_VehData

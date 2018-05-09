@@ -13,7 +13,7 @@
 #include "MriTypeSupportImpl.h"	//Mri data formats
 
 #include "Sleep.h"	// Sleep()
-#include "TimeSync.h"
+#include "MriTimeSync.h"
 #include "QueueTs.h"
 //#include "main.h"
 #include "Start.h"

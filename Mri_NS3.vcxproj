@@ -298,9 +298,6 @@
 -->
   </ItemDefinitionGroup>
   <ItemGroup>
-    <Midl Include="Mri.idl" />
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="DataReaderListenerImpl_Aux2Strings.cpp">
     </ClCompile>
     <ClCompile Include="DataReaderListenerImpl_V2XMessage.cpp" />
@@ -314,6 +311,7 @@
     <ClCompile Include="DataWriter_V2XMessage.cpp" />
     <ClCompile Include="DataWriter_VehData.cpp" />
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="MriTimeSync.cpp" />
     <ClCompile Include="OpenDDST.cpp" />
     <ClCompile Include="ParticipantClass.cpp">
     </ClCompile>
@@ -322,10 +320,6 @@
     <ClCompile Include="Start.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="SubscriberClass.cpp">
-    </ClCompile>
-    <ClCompile Include="TimeSyncClient.cpp">
-    </ClCompile>
-    <ClCompile Include="TimeSyncServer.cpp">
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -339,6 +333,7 @@
     <ClInclude Include="DataWriter_V2XMessage.h" />
     <ClInclude Include="DataWriter_VehData.h" />
     <ClInclude Include="mriCommon_Export.h" />
+    <ClInclude Include="MriTimeSync.h" />
     <ClInclude Include="OpenDDS.h" />
     <ClInclude Include="ParticipantClass.h" />
     <ClInclude Include="PublisherClass.h" />
@@ -348,7 +343,6 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="SubscriberClass.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="TimeSync.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="mri.mpc">
