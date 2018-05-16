@@ -10,7 +10,7 @@ void TimestampThread();
 
 long GenerateAPP_ID();
 
-bool TimeSynchronization(DDS::DomainParticipant_var m_participant, DDS::Subscriber_var m_subscriber, DDS::Publisher_var m_publisher);
+bool TimeSynchronizationGetVEH_ID(DDS::DomainParticipant_var m_participant, DDS::Subscriber_var m_subscriber, DDS::Publisher_var m_publisher);
 
 void SetTimestamp(long perfectTimestamp);
 
@@ -26,6 +26,10 @@ long MedianOffsetServerApp();
 
 bool SendSyncMessage();
 
+bool SendRegisterVehIdMessage();
+
+bool SendUnregisterAppMessage();
+
 long long startTimer(void);
 
 long endTimer(long long const & begin);
@@ -34,7 +38,7 @@ long endTimer(long long const & begin);
 
 const std::string TAG_TIME_SYNC = "timesync";
 const std::string TAG_DNPW = "dnpw";
-const std::string TAG_REGISTER_VEH_ID = "register_veh_idh";
+const std::string TAG_REGISTER_VEH_ID = "register_veh_id";
 const std::string TAG_UNREGISTER_APP = "unregister_app";
 
 const long SERVER_ID = 0;

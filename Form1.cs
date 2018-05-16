@@ -29,7 +29,7 @@ namespace test01csharp
 
 
         [DllImport("mri_opendds.dll", CallingConvention = CallingConvention.Cdecl)]
-        public extern static void start_opendds();
+        public extern static bool start_opendds();
 
         [DllImport("mri_opendds.dll", CallingConvention = CallingConvention.Cdecl)]
         public extern static void stop_opendds();
@@ -41,7 +41,7 @@ namespace test01csharp
         public extern static void getVehsArray(out int Num_Vehicles, out IntPtr VehicleData);
 
         [DllImport("mri_opendds.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-        public  extern static void updateSubjectCarLocation(long veh_id, float pos_x, float pos_y, float pos_z, float heading, float pitch, float roll);
+        public  extern static void updateSubjectCarLocation( float pos_x, float pos_y, float pos_z, float heading, float pitch, float roll, float speed);
 
 
 
@@ -180,15 +180,18 @@ namespace test01csharp
 
         private void button1_Click(object sender, EventArgs e)
         {
-            label1.Text =  getR().ToString();
-            //updateSubjectCarLocation(999, 2.1f, 0.0f, 67.3f, 90);
+           
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
             try
             {
-                start_opendds();
+                bool result = start_opendds();
+                if (result==false)
+                {
+                    MessageBox.Show("Problem with TimeServer");
+                }
             }
             catch (Exception er)
             {
@@ -253,7 +256,7 @@ namespace test01csharp
 
         private void button5_Click(object sender, EventArgs e)
         {
-            updateSubjectCarLocation(1, 47.22f,  -1340.28f, 0f, 45f, 0,0);
+            updateSubjectCarLocation( 47.22f,  -1340.28f, 0f, 45f, 0,0,0);
         }
 
         private void timer1_Tick(object sender, EventArgs e)
@@ -274,7 +277,7 @@ namespace test01csharp
                 textBox1.Text = t;
 
 
-                updateSubjectCarLocation(1, 47.5f, -1340.28f, 0f, -3.14f, 0, 0);
+                updateSubjectCarLocation( 47.5f, -1340.28f, 0f, -3.14f, 0, 0,0);
 
                 float dnpwDistance = GetDnpwDistance();
                 label1.Text = dnpwDistance.ToString() + " m";
@@ -308,7 +311,12 @@ namespace test01csharp
             //start
             try
             {
-                start_opendds();
+                bool result = start_opendds();
+                if (result == false)
+                {
+                    MessageBox.Show("Problem with TimeServer");
+                    
+                }
             }
             catch (Exception er)
             {
@@ -339,7 +347,7 @@ namespace test01csharp
         private void button5_Click_1(object sender, EventArgs e)
         {
             //send
-            updateSubjectCarLocation(1, 47.22f, -1340.28f, 0f, 45f, 0, 0);
+            updateSubjectCarLocation( 47.22f, -1340.28f, 0f, 45f, 0, 0,0);
         }
     }
 

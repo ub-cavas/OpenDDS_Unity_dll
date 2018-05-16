@@ -4,11 +4,11 @@
 #define PI 3.14159265359
 
 
-//used to control threads' access to unityVehsMapSet
-#define ACCESS_unityVehsMapThread 1		//access for unityVehsMapThread
-#define ACCESS_getVehsArray 2
-#define ACCESS_request_getVehsArray 3 //request to get access for unityVehsMapThread
-#define ACCESS_none 4
+////used to control threads' access to unityVehsMapSet
+//#define ACCESS_unityVehsMapThread 1		//access for unityVehsMapThread
+//#define ACCESS_getVehsArray 2
+//#define ACCESS_request_getVehsArray 3 //request to get access for unityVehsMapThread
+//#define ACCESS_none 4
  
 
 
@@ -43,21 +43,14 @@ struct UnityVehicle
 
 #define RDTest __declspec (dllexport)
 
-extern "C" RDTest void start_opendds();
+extern "C" RDTest bool start_opendds();
 
 extern "C" RDTest void stop_opendds();
 
 
-
-//extern "C" RDTest void getVehs();
-
-extern "C" RDTest int getR();
-
-extern "C" RDTest int getD();
-
 extern "C" RDTest void getVehsArray(int * Num_Vehicles, UnityVehicle ** VehicleData);
 
-extern "C" RDTest void updateSubjectCarLocation(long veh_id, float pos_x, float pos_y, float pos_z, float heading, float pitch, float roll);
+extern "C" RDTest void updateSubjectCarLocation( float pos_x, float pos_y, float pos_z, float heading, float pitch, float roll);
 
 extern "C" RDTest float GetDnpwDistance();
 
@@ -67,6 +60,7 @@ extern "C" RDTest float GetDnpwDistance();
 UnityVehicle interpolateVehPosition(std::set<UnityVehicle>* _set, long x_timestamp, long x_elapsed_microseconds);
 
 UnityVehicle lerpRD(UnityVehicle * u_prev, UnityVehicle * u_next, long x_timestamp, long elapsedMicrosecond);
+
 
 //UnityVehicle lerpRD(UnityVehicle * u_prev, UnityVehicle * u_next, long x_timestamp);
 

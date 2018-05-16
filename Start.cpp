@@ -56,6 +56,8 @@ extern QueueTs<Mri::VehData> vehdata_queue_in;
 
 extern std::atomic<long> veh_id_to_remove;
 
+extern long VEH_ID;
+
 
 UnityVehicle unityVehArray[200];
 
@@ -200,8 +202,8 @@ void getVehsArray(int* Num_Vehicles, UnityVehicle** unityVehicleData) {
 	catch (const std::exception&)
 	{
 		std::cout << "ERROR !" << std::endl;
-		access_unityVehMapSets = ACCESS_none;
-		log_rd += ", Error at the end";
+		//access_unityVehMapSets = ACCESS_none;
+		//log_rd += ", Error at the end";
 	}
 	
 
@@ -256,17 +258,6 @@ UnityVehicle interpolateVehPosition(std::set<UnityVehicle> *  _set, long x_times
 
 						}
 					}
-
-
-
-
-
-
-
-
-
-
-
 
 					break;
 				}
@@ -324,7 +315,7 @@ UnityVehicle lerpRD(UnityVehicle * u_prev, UnityVehicle * u_next, long x_timesta
 
 
 
-void updateSubjectCarLocation(long veh_id, float pos_x, float pos_y, float pos_z, float heading, float pitch, float roll) {
+void updateSubjectCarLocation( float pos_x, float pos_y, float pos_z, float heading, float pitch, float roll, float speed) {
 	
 	// normalize radian angle
 	
@@ -336,7 +327,7 @@ void updateSubjectCarLocation(long veh_id, float pos_x, float pos_y, float pos_z
 
 
 
-	subjectCar.vehicle_id = veh_id;
+	subjectCar.vehicle_id = VEH_ID;
 	subjectCar.position_x = (double)pos_x;
 	subjectCar.position_y = (double)pos_y;
 	subjectCar.position_z = (double)pos_z;
@@ -344,77 +335,11 @@ void updateSubjectCarLocation(long veh_id, float pos_x, float pos_y, float pos_z
 	subjectCar.orient_heading = (double)heading_rad;
 	subjectCar.orient_pitch = (double)pitch_rad;
 	subjectCar.orient_roll = (double)roll_rad;
+	subjectCar.speed = (double)speed;
 
 }
 
-
-//void getVehsArray(int* Num_Vehicles, UnityVehicle** unityVehicleData) {
-//
-//
-//	int indx = 0;
-//	*Num_Vehicles = 0;
-//
-//
-//	if (unityVehsMap.size()>0)
-//	{
-//		std::map<long, UnityVehicle> vehs_map_copy2;
-//		vehs_map_copy2 = unityVehsMap;
-//
-//		//std::cout << "............." << std::endl;
-//
-//		for (auto& x : vehs_map_copy2) {
-//			unityVehArray[indx] = x.second;
-//
-//			indx++;
-//
-//			//std::cout << x.second.timestamp << "   vehId:" << x.second.vehicle_id << std::endl;
-//
-//		}
-//
-//		*unityVehicleData = unityVehArray;
-//		*Num_Vehicles = indx;
-//
-//	}
-//	else
-//	{
-//		std::cout << "..VehsMap empty ..." << std::endl;
-//
-//	}
-//
-//
-//
-//
-//}
-
-
-//void getVehs() {
-//	Mri::VehData vehArray[100];
-//
-//	if (vehs_map.size()>0)
-//	{
-//		std::map<long, Mri::VehData> vehs_map_copy2;
-//		vehs_map_copy2 = vehs_map;
-//
-//		std::cout << "............." << std::endl;
-//
-//		int indx = 0;
-//
-//		for (auto& x : vehs_map_copy2) {
-//			vehArray[indx] = x.second;
-//			indx++;
-//			std::cout << x.second.timestamp << "   vehId:" << x.second.vehicle_id<< std::endl;
-//		}
-//	}
-//	else
-//	{
-//		std::cout << "..VehsMap empty ..." << std::endl;
-//
-//	}
-//
-//
-//}
-
-void start_opendds() {
+bool start_opendds() {
 
 	std::cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&  START &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&";
 	finish_application = false;
@@ -438,8 +363,6 @@ void start_opendds() {
 
 	threadTimestamp = std::thread (TimestampThread);
 
-	//std::thread threadOpenDDS(OpenDDSThread, argc, argv2);
-
 	threadOpenDDS = std::thread(OpenDDSThread, argc, argv2);
 
 
@@ -448,73 +371,26 @@ void start_opendds() {
 		//wait until threadOpenDDS is initialized;
 	}
 
-	//std::thread threadVehsMap(vehsMapThread);
 
-	threadVehsMap = std::thread( unityVehsMapThread);
-	threadPublishSubjectCarLocation = std::thread(publishSubjectCarLocationThread);
+	//check if initialization of OpenDDSThread was successfull
 
-	//srand(time(NULL));
-
-
-
+	if (!finish_application)
+	{
+		threadVehsMap = std::thread(unityVehsMapThread);
+		threadPublishSubjectCarLocation = std::thread(publishSubjectCarLocationThread);
 
 
+		std::cout << "Thread unityVehsMap started " << std::endl;
 
+		return true;
+	}
+	else
+	{
+		threadTimestamp.detach();
+		threadOpenDDS.detach();
+		return false;
+	}
 
-
-
-
-
-	//std::map<long, UnityVehicle> unityVehsMap_copy;
-
-	//std::chrono::time_point<std::chrono::system_clock> t = std::chrono::system_clock::now();	//sleep below
-	//																							// main loop
-	//while (!finish_application)
-	//{
-	//	//std::cout << "From Start.cpp: " << argc << std::endl;
-
-
-	//	t += std::chrono::milliseconds(500);	//each loop 50 ms
-	//	std::this_thread::sleep_until(t);
-
-
-
-	//	old_veh_timestamp = GetTimestamp() - 50;	//to find veh data not updated for 50 x 10ms = 500 ms
-	//	if (unityVehsMap.size() > 0)
-	//	{
-	//		unityVehsMap_copy = unityVehsMap;
-
-	//		for (auto& x : unityVehsMap_copy) {
-	//			if (x.second.timestamp < old_veh_timestamp)
-	//			{
-	//				//select this veh_id to removing
-	//				veh_id_to_remove = x.second.vehicle_id;
-
-	//			}
-	//			//std::cout << "timestamp=" << x.second.timestamp << " veh_id=" << x.second.vehicle_id << " x=" << x.second.position_x << " y=" << x.second.position_y << std::endl;
-	//		}
-
-
-
-
-
-
-	//	}
-
-	//}
-	////wait for a finish of all threads
-
-	std::cout << "Thread unityVehsMap started "<< std::endl;
-
-	
-
-
-	/*threadOpenDDS.detach();
-	threadVehsMap.detach();*/
-
-
-
-	
 
 }
 
@@ -523,12 +399,16 @@ void stop_opendds() {
 	std::cout << "---------------------------------  Try to  STOP ------------------------------------";
 	
 	finish_application = true;
+
+
 	
 
 	threadTimestamp.detach();
 	threadVehsMap.detach();
 	threadPublishSubjectCarLocation.detach();
+	SendUnregisterAppMessage();
 	Sleep(1000);
+	
 	threadOpenDDS.detach();
 	
 

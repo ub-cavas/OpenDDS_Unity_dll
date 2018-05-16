@@ -1,11 +1,9 @@
 #pragma once
 
-//bool getInput(char * c);
 #include "MriTypeSupportImpl.h"
 #include "Start.h"
 
 
-//void convertUnityVeh(Mri::VehData * veh, UnityVehicle * uVeh);
 
 UnityVehicle convertUnityVeh(Mri::VehData veh);
 
@@ -18,8 +16,6 @@ void unityVehsMapThread();
 int removeVehFromMap();
 
 void addVehToMap(Mri::VehData _veh);
-
-//void vehsMapThread();
 
 void OpenDDSThread(int argc, char * argv[]);
 

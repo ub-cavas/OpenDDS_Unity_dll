@@ -14,7 +14,7 @@
 //bool SynchronizeTime();
 //bool ParseAux2Strings(Mri::Aux2Strings aux_message);
 //
-//void TimeSynchronization(DDS::DomainParticipant_var m_participant, DDS::Subscriber_var m_subscriber, DDS::Publisher_var m_publisher);
+//void TimeSynchronizationGetVEH_ID(DDS::DomainParticipant_var m_participant, DDS::Subscriber_var m_subscriber, DDS::Publisher_var m_publisher);
 //
 //long long startTimer(void);
 //

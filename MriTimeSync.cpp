@@ -32,6 +32,7 @@ std::vector<long> timestampOffsetServerApp;
 long lastTimestampFromServer;
 
 long THIS_APP_ID = -1;	// you have to set unique THIS_APP_ID
+long VEH_ID = -1;		// you have to get veh_id from timeserver
 
 extern bool finish_application;
 
@@ -78,7 +79,7 @@ long GenerateAPP_ID() {
 
 
 
-bool TimeSynchronization(DDS::DomainParticipant_var m_participant, DDS::Subscriber_var m_subscriber, DDS::Publisher_var m_publisher)
+bool TimeSynchronizationGetVEH_ID(DDS::DomainParticipant_var m_participant, DDS::Subscriber_var m_subscriber, DDS::Publisher_var m_publisher)
 {
 
 	DataReader_Aux2Strings reader(m_participant, m_subscriber, "Mri_Control");
@@ -130,6 +131,33 @@ bool TimeSynchronization(DDS::DomainParticipant_var m_participant, DDS::Subscrib
 
 	SetTimestamp(GetTimestamp() + offsetServerApp + delayToAndFrom/2);
 
+
+	//get VEH_ID from timeserver
+
+	VEH_ID = -1;
+
+	SendRegisterVehIdMessage();
+	//wait 500 ms for answer from timeserver
+	t += std::chrono::milliseconds(500);
+	std::this_thread::sleep_until(t);
+
+	if (VEH_ID==-1)
+	{
+		//repeat
+		SendRegisterVehIdMessage();
+		//wait 1500 ms for answer from timeserver
+		t += std::chrono::milliseconds(1500);
+		std::this_thread::sleep_until(t);
+
+		if (VEH_ID==-1) {
+			//there is a problem with timeserwer
+			//quit
+			return false;
+		}
+	}
+
+	cout << "VehId=" << VEH_ID << endl << endl;
+
 	return true;
 }
 
@@ -172,6 +200,17 @@ bool ParseAux2Strings(Mri::Aux2Strings aux_message)
 	//Do Not Pass Warning
 	if (strcmp(aux_message.tag, TAG_DNPW.c_str()) == 0) {
 		ProcessDoNotPassWarningMessage(aux_message);
+		return true;
+	}
+
+
+
+
+	if (aux_message.senderId == SERVER_ID && strcmp(aux_message.tag, TAG_REGISTER_VEH_ID.c_str()) == 0)
+	{
+		// server sent value of veh_id for this application
+		VEH_ID = atol(aux_message.str2);
+		return true;
 	}
 
 	return true;
@@ -212,7 +251,7 @@ bool SendSyncMessage() {
 
 	auxMessage.receiverId = SERVER_ID;
 	auxMessage.senderId = THIS_APP_ID;
-	auxMessage.tag = "timesync";
+	auxMessage.tag = TAG_TIME_SYNC.c_str();
 	auxMessage.str1 = s.c_str();
 	auxMessage.str2 = "";
 
@@ -224,6 +263,84 @@ bool SendSyncMessage() {
 	std::cout << "Sent timesync message at: " << GetTimestamp() << std::endl << std::endl;
 	return true;
 }
+
+
+bool SendRegisterVehIdMessage() {
+	Mri::Aux2Strings auxMessage;
+	//send to get veh_id from timeserver
+	std::string s = std::to_string(GetTimestamp());
+
+	auxMessage.receiverId = SERVER_ID;
+	auxMessage.senderId = THIS_APP_ID;
+	auxMessage.tag = TAG_REGISTER_VEH_ID.c_str();
+	auxMessage.str1 = "";
+	auxMessage.str2 = "";
+
+	int success = writer_global_aux2strings->write(auxMessage, DDS::HANDLE_NIL);
+	if (success != DDS::RETCODE_OK) {
+		ACE_ERROR((LM_ERROR, ACE_TEXT("(%P|%t) ERROR: Register veh_id send message write returned %d.\n"), success));
+		return false;
+	}
+
+	std::cout << "Sent timesync message at: " << GetTimestamp() << std::endl << std::endl;
+	return true;
+}
+
+
+bool SendUnregisterAppMessage() {
+	Mri::Aux2Strings auxMessage;
+	//send to unregister App from timeserver, to release veh_id
+	std::string s = std::to_string(GetTimestamp());
+
+	auxMessage.receiverId = SERVER_ID;
+	auxMessage.senderId = THIS_APP_ID;
+	auxMessage.tag = TAG_UNREGISTER_APP.c_str();
+	auxMessage.str1 = "";
+	auxMessage.str2 = "";
+
+	int success = writer_global_aux2strings->write(auxMessage, DDS::HANDLE_NIL);
+	if (success != DDS::RETCODE_OK) {
+		ACE_ERROR((LM_ERROR, ACE_TEXT("(%P|%t) ERROR: Register veh_id send message write returned %d.\n"), success));
+		return false;
+	}
+
+	std::cout << "Sent Unregister App message at: " << GetTimestamp() << std::endl << std::endl;
+	return true;
+}
+
+
+//..............................................................................................
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 long long startTimer(void)
 {
