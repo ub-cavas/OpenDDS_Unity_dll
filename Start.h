@@ -50,7 +50,7 @@ extern "C" RDTest void stop_opendds();
 
 extern "C" RDTest void getVehsArray(int * Num_Vehicles, UnityVehicle ** VehicleData);
 
-extern "C" RDTest void updateSubjectCarLocation( float pos_x, float pos_y, float pos_z, float heading, float pitch, float roll);
+extern "C" RDTest void updateSubjectCarLocation( float pos_x, float pos_y, float pos_z, float heading, float pitch, float roll,float speed);
 
 extern "C" RDTest float GetDnpwDistance();
 

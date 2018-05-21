@@ -230,7 +230,6 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>ACEd.lib;TAOd.lib;TAO_AnyTypeCoded.lib;TAO_PortableServerd.lib;TAO_CodecFactoryd.lib;TAO_PId.lib;TAO_BiDirGIOPd.lib;OpenDDS_Dcpsd.lib;OpenDDS_InfoRepoDiscoveryd.lib;OpenDDS_Tcpd.lib;TAO_Svc_Utilsd.lib;mriCommond.lib;iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)mri_opendds.dll</OutputFile>
       <AdditionalLibraryDirectories>.;$(ACE_ROOT)\lib;..\..\..\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ProgramDatabaseFile>$(OutDir)$(TargetName).pdb</ProgramDatabaseFile>
       <!--
