@@ -70,6 +70,9 @@
     <ClCompile Include="MriTimeSync.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="V2xApps.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DataReader_Aux2Strings.h">
@@ -130,6 +133,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MriTimeSync.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="V2xApps.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

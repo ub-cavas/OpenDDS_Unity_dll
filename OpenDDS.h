@@ -19,6 +19,8 @@ void addVehToMap(Mri::VehData _veh);
 
 void OpenDDSThread(int argc, char * argv[]);
 
+void v2xMapThread();
+
 void garbageCollectionMap();
 
 

@@ -30,6 +30,8 @@
 #include "MriTimeSync.h"
 #include "OpenDDS.h"
 #include "Start.h"
+#include "V2xApps.h"
+
 
 using std::cerr;
 using std::cout;
@@ -58,7 +60,9 @@ std::mutex mutexMap;
 
 
 //std::queue<Mri::V2XMessage> v2x_queue_in;
-QueueTs<Mri::V2XMessage> v2x_queue_in;
+//QueueTs<Mri::V2XMessage> v2x_queue_in;
+QueueTs<Mri::V2XMessage> v2x_queue;
+
 std::map<long, Mri::V2XMessage> v2xs_map;
 
 
@@ -403,8 +407,16 @@ void OpenDDSThread(int argc, char* argv[]){
 			// for reading dnpw v2x messages
 			dnpw_closestVehicleMessage_distance = 99999;	//initial value.  99999 means a vehicle is out of range
 			dnpw_closestVehicleMessage_timestamp = 0;
-			DataReader_Aux2Strings reader(participant, subscriber, "Mri_Control");
 
+
+			
+			//create reader to receive V2X message  Mri_V2XfromNS3  (Mri_V2XtoNS3)
+			DataReader_V2XMessage reader_v2xmessage(participant, subscriber, "Mri_V2XfromNS3");
+
+
+
+			// to use register veh_id unregister
+			DataReader_Aux2Strings reader(participant, subscriber, "Mri_Control");
 			DataWriter_Aux2Strings writer_aux_message(participant, publisher, "Mri_Control");
 			writer_global_aux2strings = writer_aux_message.msg_writer;
 
@@ -474,6 +486,68 @@ void OpenDDSThread(int argc, char* argv[]){
 }
 
 
+
+void v2xMapThread() {
+
+	// thread where app receives v2x messages from NS-3
+	Mri::V2XMessage _v2x;
+
+
+	while (!finish_application)
+	{
+
+
+		Mri::VehData subjectCar1;
+		Mri::VehData _veh;
+
+
+		float distance = -1;
+
+
+
+
+		//wait for something at the queue
+		v2x_queue.pop(_v2x);
+		{
+
+
+			_veh = readVehDatafromString((string)_v2x.message);
+			subjectCar1 = getSubjectCarPosition();
+
+			if (subjectCar1.vehicle_id != _veh.vehicle_id)
+			{
+				distance = doNotPassWarning(subjectCar1.position_x, subjectCar1.position_y, subjectCar1.orient_heading, _veh.position_x, _veh.position_y, _veh.orient_heading);
+
+				if (distance>0 && distance <160)
+				{
+					//cout << endl << " *** WARNING  distance= " << distance << " ***" << endl << endl;
+					//sendDNPWMessage(distance, 5); // 5 is an app id of OpenDS 1
+
+
+
+					
+					if (distance < dnpw_closestVehicleMessage_distance)
+					{
+						//this vehicle is closer, we have to update
+						dnpw_closestVehicleMessage_distance = distance;
+						dnpw_closestVehicleMessage_timestamp = GetTimestamp();
+
+						cout << "Warning distance=" << dnpw_closestVehicleMessage_distance << " at=" << dnpw_closestVehicleMessage_timestamp << endl;
+					}
+
+				}
+
+
+
+				/*		cout << endl << GetTimestamp() << "   V2X: senderId  = " << _v2x.sender_id
+				<< "     receiverId = " << _v2x.recipient_id
+				<< "     veh_X=" << _veh.position_x << " y=" << _veh.position_y << endl;*/
+			}
+
+
+		}
+	}
+}
 
 
 void garbageCollectionMap()
@@ -618,20 +692,20 @@ void publishVehDataMessage(Mri::VehData car) {
 }
 
 
-void publishV2xMessage(Mri::V2XMessage v2x) {
-	int success =  writer_global_v2xmessage->write(v2x, DDS::HANDLE_NIL);
-	if (success == DDS::RETCODE_OK)
-	{
-		
-		std::cout << endl << "@@ RESEND V2X from veh_id:" << v2x.sender_id << " to veh_id:" << v2x.recipient_id << " timestamps: "
-			<< v2x.sender_timestamp << " -> " << v2x.recipient_timestamp << std::endl;
-	}
-	else
-	{
-		throw std::string("ERROR: DataWriter V2XMessage::sendMessage write");
-		//ACE_ERROR((LM_ERROR, ACE_TEXT("(%P|%t) ERROR: Publisher::sendMessage write returned %d.\n"), success));
-	}
-}
+//void publishV2xMessage(Mri::V2XMessage v2x) {
+//	int success =  writer_global_v2xmessage->write(v2x, DDS::HANDLE_NIL);
+//	if (success == DDS::RETCODE_OK)
+//	{
+//		
+//		std::cout << endl << "@@ RESEND V2X from veh_id:" << v2x.sender_id << " to veh_id:" << v2x.recipient_id << " timestamps: "
+//			<< v2x.sender_timestamp << " -> " << v2x.recipient_timestamp << std::endl;
+//	}
+//	else
+//	{
+//		throw std::string("ERROR: DataWriter V2XMessage::sendMessage write");
+//		//ACE_ERROR((LM_ERROR, ACE_TEXT("(%P|%t) ERROR: Publisher::sendMessage write returned %d.\n"), success));
+//	}
+//}
 
 
 void ProcessDoNotPassWarningMessage(Mri::Aux2Strings dnpwAux)
