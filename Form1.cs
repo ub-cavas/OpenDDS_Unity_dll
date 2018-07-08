@@ -20,8 +20,8 @@ namespace test01csharp
     {
         
 
-        [DllImport("mri_opendds.dll", CallingConvention = CallingConvention.Cdecl)]
-        public extern static int getR();
+        //[DllImport("mri_opendds.dll", CallingConvention = CallingConvention.Cdecl)]
+        //public extern static int getR();
 
         [DllImport("mri_opendds.dll", CallingConvention = CallingConvention.Cdecl)]
         public extern static float GetDnpwDistance();

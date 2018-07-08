@@ -29,8 +29,8 @@
 // TAO_IDL - Generated from
 // be\be_codegen.cpp:652
 
-#ifndef _TAO_IDL_MRIS_3OAJYW_CPP_
-#define _TAO_IDL_MRIS_3OAJYW_CPP_
+#ifndef _TAO_IDL_MRIS_BVFFD8_CPP_
+#define _TAO_IDL_MRIS_BVFFD8_CPP_
 
 
 #include "MriS.h"

@@ -346,7 +346,10 @@ bool start_opendds() {
 	finish_application = false;
 
 	threadOpenDDS_initialized = false;
-	char *argv2[] = { "-DCPSConfigFile","C:\\rtps\\rtps.ini" };
+	//char *argv2[] = { "-DCPSConfigFile","C:\\rtps\\rtps.ini" };
+
+	char *argv2[] = { "-DCPSConfigFile","C:\\iCAVE2\\Bin\\OpenDDS_Repo\\rtps.ini" };
+
 	int argc = 2;
 
 
@@ -405,7 +408,7 @@ void stop_opendds() {
 
 
 	
-
+	threadV2Xreading.detach();
 	threadTimestamp.detach();
 	threadVehsMap.detach();
 	threadPublishSubjectCarLocation.detach();

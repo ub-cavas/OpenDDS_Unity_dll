@@ -328,6 +328,13 @@ void OpenDDSThread(int argc, char* argv[]){
 			not initialized*/
 
 
+
+
+
+
+
+
+
 		// Initialize DomainParticipantFactory
  		DDS::DomainParticipantFactory_var dpf =
 			TheParticipantFactoryWithArgs(argc, argv);
@@ -461,13 +468,6 @@ void OpenDDSThread(int argc, char* argv[]){
 		}
 		
 
-		
-
-		//-------------------------------------------------------------------------------------------------
-		// Clean-up!
-
-		//threadTimestamp.detach();
-
 		participant->delete_contained_entities();
 		dpf->delete_participant(participant);
 
@@ -592,9 +592,41 @@ void garbageCollectionMap()
 }
 
 
+void publishVehDataMessage(Mri::VehData car) {
+	int success = writer_global_vehdata->write(car, DDS::HANDLE_NIL);
+	if (success == DDS::RETCODE_OK)
+	{
+		//std::cout << "Send SubjectCar position x=" << car.position_x << ", y=" << car.position_y << ", z=" << car.position_z << ", timestamp=" << car.timestamp << std::endl;
+	}
+	else
+	{
+		throw std::string("ERROR: DataWriter VehData::sendMessage write");
+		//ACE_ERROR((LM_ERROR, ACE_TEXT("(%P|%t) ERROR: Publisher::sendMessage write returned %d.\n"), success));
+	}
+}
 
 
 
+
+
+
+
+
+//-----------------------------------------------------------
+//  NOT used !!
+//-----------------------------------------------------------
+void ProcessDoNotPassWarningMessage(Mri::Aux2Strings dnpwAux)
+{
+	float aux_distance = atof(dnpwAux.str1);
+	if (aux_distance < dnpw_closestVehicleMessage_distance)
+	{
+		//this vehicle is closer, we have to update
+		dnpw_closestVehicleMessage_distance = aux_distance;
+		dnpw_closestVehicleMessage_timestamp = GetTimestamp();
+
+		cout << "Warning distance=" << dnpw_closestVehicleMessage_distance << " at=" << dnpw_closestVehicleMessage_timestamp << endl;
+	}
+}
 
 //
 //long generateV2xUniqueTimestamp(long v2x_timestamp) {
@@ -678,18 +710,6 @@ void garbageCollectionMap()
 //
 //}
 
-void publishVehDataMessage(Mri::VehData car) {
-	int success = writer_global_vehdata->write(car, DDS::HANDLE_NIL);
-	if (success == DDS::RETCODE_OK)
-	{
-		//std::cout << "Send SubjectCar position x=" << car.position_x << ", y=" << car.position_y << ", z=" << car.position_z << ", timestamp=" << car.timestamp << std::endl;
-	}
-	else
-	{
-		throw std::string("ERROR: DataWriter VehData::sendMessage write");
-		//ACE_ERROR((LM_ERROR, ACE_TEXT("(%P|%t) ERROR: Publisher::sendMessage write returned %d.\n"), success));
-	}
-}
 
 
 //void publishV2xMessage(Mri::V2XMessage v2x) {
@@ -706,30 +726,6 @@ void publishVehDataMessage(Mri::VehData car) {
 //		//ACE_ERROR((LM_ERROR, ACE_TEXT("(%P|%t) ERROR: Publisher::sendMessage write returned %d.\n"), success));
 //	}
 //}
-
-
-void ProcessDoNotPassWarningMessage(Mri::Aux2Strings dnpwAux)
-{
-	float aux_distance = atof(dnpwAux.str1);
-	if (aux_distance < dnpw_closestVehicleMessage_distance)
-	{
-		//this vehicle is closer, we have to update
-		dnpw_closestVehicleMessage_distance = aux_distance;
-		dnpw_closestVehicleMessage_timestamp = GetTimestamp();
-
-		cout << "Warning distance=" << dnpw_closestVehicleMessage_distance << " at=" << dnpw_closestVehicleMessage_timestamp << endl;
-	}
-}
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -792,8 +788,6 @@ void ProcessDoNotPassWarningMessage(Mri::Aux2Strings dnpwAux)
 //		}
 //	}
 //}
-
-
 
 
 //

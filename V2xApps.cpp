@@ -14,7 +14,7 @@ using std::string;
 #define PI 3.14159265359
 extern long THIS_APP_ID;
 
-
+//converts data from VehData veh to BSM text
 string createBSMcoreData(Mri::VehData veh) {
 
 
@@ -25,7 +25,7 @@ string createBSMcoreData(Mri::VehData veh) {
 
 }
 
-
+//convert BSM text to VehData struct
 Mri::VehData readVehDatafromString(std::string message) {
 
 
@@ -57,7 +57,7 @@ Mri::VehData readVehDatafromString(std::string message) {
 
 }
 
-
+//returns position of point after rotation
 Point2D RotatePoint(Point2D point, double angle)
 {
 	Point2D _point;
@@ -67,12 +67,13 @@ Point2D RotatePoint(Point2D point, double angle)
 	return _point;
 };
 
-
+// helper for PointInTriangle function
 float sign(Point2D p1, Point2D p2, Point2D p3)
 {
 	return (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y);
 }
 
+//checks if point pt is inside a triangle v1,v2,v3
 bool PointInTriangle(Point2D pt, Point2D v1, Point2D v2, Point2D v3)
 {
 	bool b1, b2, b3;
@@ -88,7 +89,9 @@ bool PointInTriangle(Point2D pt, Point2D v1, Point2D v2, Point2D v3)
 
 
 
-//void doNotPassWarning(double h_h)
+//checks if tested vehicle (t_) is on the opposite lane on the road
+//if it does, return distance from human veh and other('tested") veh
+//if it doesn't return -1   which means no warning
 float doNotPassWarning(double h_x, double h_y, double h_h, double t_x, double t_y, double t_h)
 {
 	// h_  human controlled veh
@@ -143,62 +146,21 @@ float doNotPassWarning(double h_x, double h_y, double h_h, double t_x, double t_
 	}
 
 
-
-	//-------------------------------------------------------------------------------
-	//old version
-	//double alpha_right = h_h + (0.65 * PI);
-
-	//
-	//
-	//if (alpha_right >(PI))
-	//	alpha_right = alpha_right - (2 * PI);  // e.g. x= 3.16 => x = 3.16 - 6.28 = -3.12
-
-	//
-
-	//double alpha_left = h_h - (0.65 * PI);
-
-	//if (alpha_left < -(PI))
-	//	alpha_left = 4 * PI + alpha_left;  // e.g  x = - 3.18 => x = 6.28 - 3.18 = 3.10 
-
-	//Point2D a_oryg = { 0,11 };
-	//Point2D b_oryg = { 260,18 };
-	//Point2D c_oryg = { 260,-3 };
-	//Point2D d_oryg = { 0,-3 };
-
-
-	//Point2D a = RotatePoint(a_oryg, h_h);
-	//Point2D b = RotatePoint(b_oryg, h_h);
-	//Point2D c = RotatePoint(c_oryg, h_h);
-	//Point2D d = RotatePoint(d_oryg, h_h);
-
-	//Point2D x_veh_point;
-
-	//if ((t_h < alpha_left && t_h > alpha_right) || ((alpha_left<(-PI / 2) && alpha_right>(PI / 2)) && (t_h < alpha_left || t_h > alpha_right)))
-	//{
-	//	a = { a.x + h_x, a.y + h_y };
-	//	b = { b.x + h_x, b.y + h_y };
-	//	c = { c.x + h_x, c.y + h_y };
-	//	d = { d.x + h_x, d.y + h_y };
-
-	//	x_veh_point = { t_x, t_y };
-
-	//	if (PointInTriangle(x_veh_point, a, b, c) || PointInTriangle(x_veh_point, a, c, d))
-	//	{
-	//		//show warning and distance
-	//		distance = sqrt(pow((t_x - h_x), 2.0) + pow((t_y - h_y), 2.0));
-
-	//	}
-	//	
-
-	//}
-
 	return distance;
 
 }
 
 
-// DNPW - Do Not Pass Warning
+
+
+
+//---------------------------------------------------------------
+//NOT used now !!
+//---------------------------------------------------------------
+//sent message DNPW to other applications using OpenDDS 
 void sendDNPWMessage(float distance_meters, long receiverAppId) {
+
+	// DNPW - Do Not Pass Warning
 
 	Mri::Aux2Strings auxMessage;
 	//long distance_feets = distance_meters / 3.28084;
