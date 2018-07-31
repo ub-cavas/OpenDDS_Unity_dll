@@ -14,6 +14,7 @@ using std::string;
 #define PI 3.14159265359
 extern long THIS_APP_ID;
 
+
 //converts data from VehData veh to BSM text
 string createBSMcoreData(Mri::VehData veh) {
 

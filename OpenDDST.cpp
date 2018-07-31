@@ -421,6 +421,11 @@ void OpenDDSThread(int argc, char* argv[]){
 			DataReader_V2XMessage reader_v2xmessage(participant, subscriber, "Mri_V2XfromNS3");
 
 
+			cout << "Create writer_v2xmessage..." << endl;
+			
+
+			DataWriter_V2XMessage writer_v2xmessage(participant, publisher, "Mri_V2XtoNS3");
+			writer_global_v2xmessage = writer_v2xmessage.msg_writer;
 
 			// to use register veh_id unregister
 			DataReader_Aux2Strings reader(participant, subscriber, "Mri_Control");
@@ -516,16 +521,13 @@ void v2xMapThread() {
 
 			if (subjectCar1.vehicle_id != _veh.vehicle_id)
 			{
+				//checks distance between our subject car(human controled) and other car _veh 
 				distance = doNotPassWarning(subjectCar1.position_x, subjectCar1.position_y, subjectCar1.orient_heading, _veh.position_x, _veh.position_y, _veh.orient_heading);
 
 				if (distance>0 && distance <160)
-				{
-					//cout << endl << " *** WARNING  distance= " << distance << " ***" << endl << endl;
-					//sendDNPWMessage(distance, 5); // 5 is an app id of OpenDS 1
+				{	
+					// dnpw_closestVehicleMessage_distance - variable with distance to the nearest vehicle on the opposite lane
 
-
-
-					
 					if (distance < dnpw_closestVehicleMessage_distance)
 					{
 						//this vehicle is closer, we have to update
@@ -536,9 +538,6 @@ void v2xMapThread() {
 					}
 
 				}
-
-
-
 				/*		cout << endl << GetTimestamp() << "   V2X: senderId  = " << _v2x.sender_id
 				<< "     receiverId = " << _v2x.recipient_id
 				<< "     veh_X=" << _veh.position_x << " y=" << _veh.position_y << endl;*/
@@ -606,6 +605,22 @@ void publishVehDataMessage(Mri::VehData car) {
 }
 
 
+
+
+void publishV2xMessage(Mri::V2XMessage v2x) {
+	int success =  writer_global_v2xmessage->write(v2x, DDS::HANDLE_NIL);
+	if (success == DDS::RETCODE_OK)
+	{
+		
+		std::cout << endl << "@@ RESEND V2X from veh_id:" << v2x.sender_id << " to veh_id:" << v2x.recipient_id << " timestamps: "
+			<< v2x.sender_timestamp << " -> " << v2x.recipient_timestamp << std::endl;
+	}
+	else
+	{
+		throw std::string("ERROR: DataWriter V2XMessage::sendMessage write");
+		//ACE_ERROR((LM_ERROR, ACE_TEXT("(%P|%t) ERROR: Publisher::sendMessage write returned %d.\n"), success));
+	}
+}
 
 
 
@@ -712,20 +727,6 @@ void ProcessDoNotPassWarningMessage(Mri::Aux2Strings dnpwAux)
 
 
 
-//void publishV2xMessage(Mri::V2XMessage v2x) {
-//	int success =  writer_global_v2xmessage->write(v2x, DDS::HANDLE_NIL);
-//	if (success == DDS::RETCODE_OK)
-//	{
-//		
-//		std::cout << endl << "@@ RESEND V2X from veh_id:" << v2x.sender_id << " to veh_id:" << v2x.recipient_id << " timestamps: "
-//			<< v2x.sender_timestamp << " -> " << v2x.recipient_timestamp << std::endl;
-//	}
-//	else
-//	{
-//		throw std::string("ERROR: DataWriter V2XMessage::sendMessage write");
-//		//ACE_ERROR((LM_ERROR, ACE_TEXT("(%P|%t) ERROR: Publisher::sendMessage write returned %d.\n"), success));
-//	}
-//}
 
 
 

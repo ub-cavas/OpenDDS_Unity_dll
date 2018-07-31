@@ -29,8 +29,8 @@
 // TAO_IDL - Generated from
 // be\be_codegen.cpp:652
 
-#ifndef _TAO_IDL_MRITYPESUPPORTS_4VHXL4_CPP_
-#define _TAO_IDL_MRITYPESUPPORTS_4VHXL4_CPP_
+#ifndef _TAO_IDL_MRITYPESUPPORTS_RTH2NP_CPP_
+#define _TAO_IDL_MRITYPESUPPORTS_RTH2NP_CPP_
 
 
 #include "MriTypeSupportS.h"

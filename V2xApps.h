@@ -4,6 +4,20 @@
 
 #include "MriTypeSupportImpl.h"
 
+
+struct BSMCoreData
+{
+
+	long vehicle_id;
+	double position_x;
+	double position_y;
+	double position_z;
+	double orient_heading;
+	double speed;
+	long brake_boost;	// 0 - unavailable, 1 - off, 2 - on;
+
+};
+
 struct Point2D
 {
 	double x;
