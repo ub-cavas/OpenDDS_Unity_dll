@@ -140,7 +140,33 @@ UnityVehicle  convertUnityVeh(Mri::VehData veh) {
 //
 //}
 
+void publishBSMThread() {
 
+	Mri::VehData _veh;
+	float _brakeForce;
+	std::string _bsm;
+	long _timestamp;
+
+
+	std::chrono::time_point<std::chrono::system_clock> t = std::chrono::system_clock::now();	//sleep below
+
+	while (!finish_application) {
+
+		_veh = getSubjectCarPosition();
+		_timestamp = GetTimestamp();
+		_brakeForce = subjectCarBrakeForce;
+		_bsm = createBSMcoreData(_veh, _brakeForce);
+		
+		
+		//publishVehDataMessage(_veh);
+		sendV2X(_veh.vehicle_id, _timestamp, _bsm);
+
+		t += std::chrono::milliseconds(100);	//each loop 100 ms
+		std::this_thread::sleep_until(t);
+	}
+
+	cout << endl << "-------------------" << endl << "-  publishSubjectCarThread Stopped " << endl << "-------------------" << endl << endl;
+}
 
 void publishSubjectCarLocationThread() {
 

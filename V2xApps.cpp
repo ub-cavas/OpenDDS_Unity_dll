@@ -182,20 +182,27 @@ float doNotPassWarning(double h_x, double h_y, double h_h, double t_x, double t_
 }
 
 
+//sendV2X(x.second.vehicle_id, GetTimestamp(), message_text);
+void sendV2X(long sender_id, long sender_timestamp, string message) {
 
-void publishV2xMessage(Mri::V2XMessage v2x) {
+	Mri::V2XMessage v2x;
+
+	v2x.sender_id = sender_id;
+	v2x.sender_timestamp = sender_timestamp;
+	v2x.message = message.c_str();
+	v2x.recipient_id = -1;
+	v2x.recipient_timestamp = -1;
+
 	int success = writer_global_v2xmessage->write(v2x, DDS::HANDLE_NIL);
-	if (success == DDS::RETCODE_OK)
-	{
-
-		std::cout << endl << "@@ RESEND V2X from veh_id:" << v2x.sender_id << " to veh_id:" << v2x.recipient_id << " timestamps: "
-			<< v2x.sender_timestamp << " -> " << v2x.recipient_timestamp << std::endl;
+	if (success != DDS::RETCODE_OK) {
+		//ACE_ERROR((LM_ERROR, ACE_TEXT("(%P|%t) ERROR: TimeSync send message write returned %d.\n"), success));
+		throw std::string("ERROR: SendV2X message failed");
 	}
 	else
 	{
-		throw std::string("ERROR: DataWriter V2XMessage::sendMessage write");
-		//ACE_ERROR((LM_ERROR, ACE_TEXT("(%P|%t) ERROR: Publisher::sendMessage write returned %d.\n"), success));
+		//cout << endl <<"     *****  SEND V2X message:" << v2x.message <<  " sender_id=" << v2x.sender_id << " sender_timestamp=" << v2x.sender_timestamp << endl;
 	}
+
 }
 
 

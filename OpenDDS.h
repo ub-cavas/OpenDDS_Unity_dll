@@ -7,6 +7,8 @@
 
 UnityVehicle convertUnityVeh(Mri::VehData veh);
 
+void publishBSMThread();
+
 void publishSubjectCarLocationThread();
 
 Mri::VehData getSubjectCarPosition();
