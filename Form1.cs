@@ -43,6 +43,9 @@ namespace test01csharp
         [DllImport("mri_opendds.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
         public  extern static void updateSubjectCarLocation( float pos_x, float pos_y, float pos_z, float heading, float pitch, float roll, float speed);
 
+        [DllImport("mri_opendds.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+        public extern static void updateBrakeStatus(float brake);
+
 
 
 
@@ -278,6 +281,8 @@ namespace test01csharp
 
 
                 updateSubjectCarLocation(-48.829f, 2732.424f, 0f,0.1f, 0f, 0f, 0f);
+
+                updateBrakeStatus(0.99f);
 
                 float dnpwDistance = GetDnpwDistance();
                 label1.Text = dnpwDistance.ToString() + " m";

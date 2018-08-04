@@ -172,8 +172,6 @@ float doNotPassWarning(double h_x, double h_y, double h_h, double t_x, double t_
 			distance = sqrt(pow((t_x - h_x), 2.0) + pow((t_y - h_y), 2.0));
 
 		}
-
-
 	}
 
 
