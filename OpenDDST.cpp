@@ -611,20 +611,7 @@ void publishVehDataMessage(Mri::VehData car) {
 
 
 
-void publishV2xMessage(Mri::V2XMessage v2x) {
-	int success =  writer_global_v2xmessage->write(v2x, DDS::HANDLE_NIL);
-	if (success == DDS::RETCODE_OK)
-	{
-		
-		std::cout << endl << "@@ RESEND V2X from veh_id:" << v2x.sender_id << " to veh_id:" << v2x.recipient_id << " timestamps: "
-			<< v2x.sender_timestamp << " -> " << v2x.recipient_timestamp << std::endl;
-	}
-	else
-	{
-		throw std::string("ERROR: DataWriter V2XMessage::sendMessage write");
-		//ACE_ERROR((LM_ERROR, ACE_TEXT("(%P|%t) ERROR: Publisher::sendMessage write returned %d.\n"), success));
-	}
-}
+
 
 
 

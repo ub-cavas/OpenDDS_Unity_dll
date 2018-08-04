@@ -15,16 +15,7 @@ using std::string;
 extern long THIS_APP_ID;
 
 
-//converts data from VehData veh to BSM text
-string createBSMcoreData(Mri::VehData veh) {
 
-
-	std::stringstream tekst;
-	tekst << veh.orient_heading << ";" << veh.position_x << ";" << veh.position_y << ";" << veh.position_z << ";" << veh.speed << ";" << veh.vehicle_id;
-	return tekst.str();
-
-
-}
 
 ////convert BSM text to VehData struct
 //Mri::VehData readVehDatafromString(std::string message) {
@@ -192,6 +183,76 @@ float doNotPassWarning(double h_x, double h_y, double h_h, double t_x, double t_
 
 
 
+void publishV2xMessage(Mri::V2XMessage v2x) {
+	int success = writer_global_v2xmessage->write(v2x, DDS::HANDLE_NIL);
+	if (success == DDS::RETCODE_OK)
+	{
+
+		std::cout << endl << "@@ RESEND V2X from veh_id:" << v2x.sender_id << " to veh_id:" << v2x.recipient_id << " timestamps: "
+			<< v2x.sender_timestamp << " -> " << v2x.recipient_timestamp << std::endl;
+	}
+	else
+	{
+		throw std::string("ERROR: DataWriter V2XMessage::sendMessage write");
+		//ACE_ERROR((LM_ERROR, ACE_TEXT("(%P|%t) ERROR: Publisher::sendMessage write returned %d.\n"), success));
+	}
+}
+
+
+
+
+//converts data from VehData and brake Force veh to BSM text
+string createBSMcoreData(Mri::VehData veh, float brakeForce) {
+
+
+	const int BRAKE_BOOST_UNAVAILABLE = 0;
+	const int BRAKE_BOOST_OFF = 1;
+	const int BRAKE_BOOST_ON = 2;
+
+	int brakeBoost = 0;
+	if (brakeForce >= BRAKE_BOOST_THRESHOLD)
+	{
+		brakeBoost = BRAKE_BOOST_ON;
+	}
+	else
+	{
+		brakeBoost = BRAKE_BOOST_OFF;
+	}
+
+	std::stringstream tekst;
+	tekst	<< veh.orient_heading << ";" << veh.position_x << ";" << veh.position_y 
+			<< ";" << veh.position_z << ";" << veh.speed << ";" << veh.vehicle_id 
+			<< ";" << brakeBoost;
+	return tekst.str();
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 //---------------------------------------------------------------
@@ -223,3 +284,6 @@ void sendDNPWMessage(float distance_meters, long receiverAppId) {
 	//std::cout << "Send timesync message at: " << GetTimestamp() << std::endl << std::endl;
 	
 }
+
+
+

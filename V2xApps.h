@@ -24,7 +24,6 @@ struct Point2D
 	double y;
 };
 
-std::string createBSMcoreData(Mri::VehData veh);
 
 BSMCoreData readVehDatafromString(std::string message);
 
@@ -36,4 +35,8 @@ bool PointInTriangle(Point2D pt, Point2D v1, Point2D v2, Point2D v3);
 
 float doNotPassWarning(double h_x, double h_y, double h_h, double t_x, double t_y, double t_h);
 
+std::string createBSMcoreData(Mri::VehData veh, float brakeForce);
+
 void sendDNPWMessage(float distance_meters, long receiverAppId);
+
+const float BRAKE_BOOST_THRESHOLD = 0.9f;	//if brake force is greater than threshold -> send brake_boost = 2 in BSM .  If not greater -> send 1
