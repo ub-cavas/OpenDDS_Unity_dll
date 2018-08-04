@@ -26,37 +26,76 @@ string createBSMcoreData(Mri::VehData veh) {
 
 }
 
+////convert BSM text to VehData struct
+//Mri::VehData readVehDatafromString(std::string message) {
+//
+//
+//		Mri::VehData _veh;
+//		std::stringstream  lineStream(message);
+//		std::string cell;
+//
+//		std::getline(lineStream, cell, ';');
+//		_veh.orient_heading = std::atof(cell.c_str());
+//	
+//		std::getline(lineStream, cell, ';');
+//		_veh.position_x = std::atof(cell.c_str());
+//
+//		std::getline(lineStream, cell, ';');
+//		_veh.position_y = std::atof(cell.c_str());
+//
+//		std::getline(lineStream, cell, ';');
+//		_veh.position_z = std::atof(cell.c_str());
+//
+//		std::getline(lineStream, cell, ';');
+//		_veh.speed = std::atof(cell.c_str());
+//
+//		std::getline(lineStream, cell, ';');
+//		_veh.vehicle_id = std::atol(cell.c_str());
+//
+//		return _veh;
+//
+//
+//
+//}
+
+
+
 //convert BSM text to VehData struct
-Mri::VehData readVehDatafromString(std::string message) {
+BSMCoreData readVehDatafromString(std::string message) {
 
+	BSMCoreData _bsm;
 
-		Mri::VehData _veh;
-		std::stringstream  lineStream(message);
-		std::string cell;
+	//Mri::VehData _veh;
+	std::stringstream  lineStream(message);
+	std::string cell;
 
-		std::getline(lineStream, cell, ';');
-		_veh.orient_heading = std::atof(cell.c_str());
-	
-		std::getline(lineStream, cell, ';');
-		_veh.position_x = std::atof(cell.c_str());
+	std::getline(lineStream, cell, ';');
+	_bsm.orient_heading = std::atof(cell.c_str());
 
-		std::getline(lineStream, cell, ';');
-		_veh.position_y = std::atof(cell.c_str());
+	std::getline(lineStream, cell, ';');
+	_bsm.position_x = std::atof(cell.c_str());
 
-		std::getline(lineStream, cell, ';');
-		_veh.position_z = std::atof(cell.c_str());
+	std::getline(lineStream, cell, ';');
+	_bsm.position_y = std::atof(cell.c_str());
 
-		std::getline(lineStream, cell, ';');
-		_veh.speed = std::atof(cell.c_str());
+	std::getline(lineStream, cell, ';');
+	_bsm.position_z = std::atof(cell.c_str());
 
-		std::getline(lineStream, cell, ';');
-		_veh.vehicle_id = std::atol(cell.c_str());
+	std::getline(lineStream, cell, ';');
+	_bsm.speed = std::atof(cell.c_str());
 
-		return _veh;
+	std::getline(lineStream, cell, ';');
+	_bsm.vehicle_id = std::atol(cell.c_str());
+
+	//_bsm.brake_boost = 
+
+	return _bsm;
 
 
 
 }
+
+
 
 //returns position of point after rotation
 Point2D RotatePoint(Point2D point, double angle)

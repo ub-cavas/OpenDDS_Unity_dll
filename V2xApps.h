@@ -26,7 +26,7 @@ struct Point2D
 
 std::string createBSMcoreData(Mri::VehData veh);
 
-Mri::VehData readVehDatafromString(std::string message);
+BSMCoreData readVehDatafromString(std::string message);
 
 Point2D RotatePoint(Point2D point, double angle);
 

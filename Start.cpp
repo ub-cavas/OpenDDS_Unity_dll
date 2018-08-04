@@ -52,6 +52,7 @@ extern std::atomic<long> dnpw_closestVehicleMessage_timestamp;
 
 
 extern Mri::VehData subjectCar;
+extern float subjectCarBrakeForce; // 0 min, 1 max
 extern QueueTs<Mri::VehData> vehdata_queue_in;
 
 
@@ -314,7 +315,9 @@ UnityVehicle lerpRD(UnityVehicle * u_prev, UnityVehicle * u_next, long x_timesta
 	return _vehicle;
 }
 
-
+void updateBrakeStatus(float brake) {
+	subjectCarBrakeForce = brake;
+}
 
 void updateSubjectCarLocation( float pos_x, float pos_y, float pos_z, float heading, float pitch, float roll, float speed) {
 	

@@ -46,6 +46,7 @@ std::atomic<long> veh_id_to_remove;
 
 QueueTs<Mri::VehData> vehdata_queue_in;
 Mri::VehData subjectCar;
+float subjectCarBrakeForce;	// store value of pressed brake in the subjectCar , 0 no press, 1 max press
 
 std::map<long, Mri::VehData> vehs_map;
 std::map<long, UnityVehicle> unityVehsMap;
@@ -75,6 +76,9 @@ long sample_counter_per_timestamp;	//used by generateV2xUniqueTimestamp
 
 std::atomic<float> dnpw_closestVehicleMessage_distance;
 std::atomic<long> dnpw_closestVehicleMessage_timestamp;
+
+//Electronic Emergency Brake Light (EEBL)
+std::atomic<float> eebl_closestVehicleMessage_distance;
 
 
 std::string log_rd_VehsMapThread;

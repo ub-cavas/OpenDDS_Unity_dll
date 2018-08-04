@@ -54,12 +54,16 @@ extern "C" RDTest void updateSubjectCarLocation( float pos_x, float pos_y, float
 
 extern "C" RDTest float GetDnpwDistance();
 
+extern "C" RDTest void updateBrakeStatus(float brake);
+
 
 //UnityVehicle interpolateVehPosition(std::set<UnityVehicle>* _set, long x_timestamp);
 
 UnityVehicle interpolateVehPosition(std::set<UnityVehicle>* _set, long x_timestamp, long x_elapsed_microseconds);
 
 UnityVehicle lerpRD(UnityVehicle * u_prev, UnityVehicle * u_next, long x_timestamp, long elapsedMicrosecond);
+
+
 
 
 //UnityVehicle lerpRD(UnityVehicle * u_prev, UnityVehicle * u_next, long x_timestamp);
