@@ -165,7 +165,7 @@ void publishBSMThread() {
 		std::this_thread::sleep_until(t);
 	}
 
-	cout << endl << "-------------------" << endl << "-  publishSubjectCarThread Stopped " << endl << "-------------------" << endl << endl;
+	cout << endl << "-------------------" << endl << "-  publishBSMThread Stopped " << endl << "-------------------" << endl << endl;
 }
 
 void publishSubjectCarLocationThread() {
@@ -533,8 +533,8 @@ void v2xMapThread() {
 
 
 		Mri::VehData subjectCar1;
-		Mri::VehData _veh;
-
+		//Mri::VehData _veh;
+		BSMCoreData _vehBSM;
 
 		float distance = -1;
 
@@ -546,13 +546,13 @@ void v2xMapThread() {
 		{
 
 
-			_veh = readVehDatafromString((string)_v2x.message);
+			_vehBSM = readVehDatafromString((string)_v2x.message);
 			subjectCar1 = getSubjectCarPosition();
 
-			if (subjectCar1.vehicle_id != _veh.vehicle_id)
+			if (subjectCar1.vehicle_id != _vehBSM.vehicle_id)
 			{
 				//checks distance between our subject car(human controled) and other car _veh 
-				distance = doNotPassWarning(subjectCar1.position_x, subjectCar1.position_y, subjectCar1.orient_heading, _veh.position_x, _veh.position_y, _veh.orient_heading);
+				distance = doNotPassWarning(subjectCar1.position_x, subjectCar1.position_y, subjectCar1.orient_heading, _vehBSM.position_x, _vehBSM.position_y, _vehBSM.orient_heading);
 
 				if (distance>0 && distance <160)
 				{	

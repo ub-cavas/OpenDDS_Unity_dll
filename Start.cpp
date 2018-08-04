@@ -28,6 +28,7 @@ extern std::map<long, Mri::VehData> vehs_map;
 std::thread threadVehsMap;
 std::thread threadV2Xreading;
 std::thread threadPublishSubjectCarLocation;
+std::thread threadPublishBSM;
 std::thread threadOpenDDS;
 std::thread threadTimestamp;
 
@@ -387,6 +388,7 @@ bool start_opendds() {
 		threadVehsMap = std::thread(unityVehsMapThread);
 		threadPublishSubjectCarLocation = std::thread(publishSubjectCarLocationThread);
 		threadV2Xreading = std::thread(v2xMapThread);
+		threadPublishBSM = std::thread(publishBSMThread);
 
 		std::cout << "Thread unityVehsMap started " << std::endl;
 
@@ -415,6 +417,7 @@ void stop_opendds() {
 	threadTimestamp.detach();
 	threadVehsMap.detach();
 	threadPublishSubjectCarLocation.detach();
+	threadPublishBSM.detach();
 	SendUnregisterAppMessage();
 	Sleep(1000);
 	

@@ -8,8 +8,9 @@
 UnityVehicle convertUnityVeh(Mri::VehData veh);
 
 void publishBSMThread();
-
 void publishSubjectCarLocationThread();
+void OpenDDSThread(int argc, char * argv[]);
+void v2xMapThread();
 
 Mri::VehData getSubjectCarPosition();
 
@@ -18,10 +19,6 @@ void unityVehsMapThread();
 int removeVehFromMap();
 
 void addVehToMap(Mri::VehData _veh);
-
-void OpenDDSThread(int argc, char * argv[]);
-
-void v2xMapThread();
 
 void garbageCollectionMap();
 
