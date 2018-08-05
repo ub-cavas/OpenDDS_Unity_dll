@@ -272,6 +272,11 @@ namespace test01csharp
                 GetTrafficVehicles(out vehsData);
                 string t = "";
 
+                if (vehsData.Count() < 1)
+                {
+                    Console.WriteLine("Count < 1");
+                }
+
                 foreach (var item in vehsData)
                 {
                     t += "  timestamp: " + item.timestamp + "   vehId=" + item.vehicle_id + " x=" + item.position_x + " y=" + item.position_y + " heading: " + item.orient_heading + "\r\n";

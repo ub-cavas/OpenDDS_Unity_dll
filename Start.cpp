@@ -147,10 +147,7 @@ void getVehsArray(int* Num_Vehicles, UnityVehicle** unityVehicleData) {
 				key_mapUnityVehs = x.first;
 
 //				log_rd = "START, go to interpolate";
-				
 			
-				
-				
 				UnityVehicle uVeh = interpolateVehPosition(&setUnityVehs, interpolate_timestamp, elapsedMicrosecondsFromLastTimeSTamp);
 
 
@@ -166,27 +163,33 @@ void getVehsArray(int* Num_Vehicles, UnityVehicle** unityVehicleData) {
 					// update a new map
 					//x.second = setUnityVehs;
 
-					unityVehsMapSets2.emplace(key_mapUnityVehs, setUnityVehs);
+
+					//update value in map
+					unityVehsMapSets[key_mapUnityVehs] = setUnityVehs;
+
+					//unityVehsMapSets2.emplace(key_mapUnityVehs, setUnityVehs);
 
 //					log_rd += ", after update map";
 				}
 				else
 				{
-					unityVehsMapSets2.emplace(x.first, x.second);
+					
+
+					//unityVehsMapSets2.emplace(x.first, x.second);
 				}
 
 				//std::cout << x.second.timestamp << "   vehId:" << x.second.vehicle_id << std::endl;
 
 			}
 
-			unityVehsMapSets.swap(unityVehsMapSets2);
+			//unityVehsMapSets.swap(unityVehsMapSets2);
 
 
 			*unityVehicleData = unityVehArray;
 			*Num_Vehicles = indx;
 
 
-			//std::cout << "---------------------------num vehs=" << indx << std::endl;
+			std::cout << "---------------------------num vehs=" << indx << std::endl;
 
 		}
 
@@ -229,6 +232,12 @@ UnityVehicle interpolateVehPosition(std::set<UnityVehicle> *  _set, long x_times
 	if (setSize >= 4)
 	{
 		
+		if (setSize>100)
+		{
+			std::cout << "Wow";
+		}
+
+
 		//std::cout << ' ' << it.;
 		try
 		{
@@ -250,7 +259,7 @@ UnityVehicle interpolateVehPosition(std::set<UnityVehicle> *  _set, long x_times
 
 						//check if it is no beginning of the set
 
-						{
+						//{
 							if (it != _set->begin()) {
 								//std::cout << "............erase%%%%";
 								it--;
@@ -259,7 +268,7 @@ UnityVehicle interpolateVehPosition(std::set<UnityVehicle> *  _set, long x_times
 								//log_rd += ", after erase";
 							}
 
-						}
+						//}
 					}
 
 					break;

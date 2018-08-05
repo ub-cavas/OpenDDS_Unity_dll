@@ -4,6 +4,7 @@
 #include <vector>
 #include <stdlib.h> //atol
 #include <algorithm> // sort
+#include <atomic> //access
 
 
 #include "DataWriter_Aux2Strings.h"
@@ -17,7 +18,7 @@ using std::endl;
 using std::string;
 
 
-long timestamp_master;
+std::atomic<long> timestamp_master;
 long elapsedMicrosecondsMaster;	//microseconds from last timestamp
 double beginMicrosecondsTicks;
 
@@ -48,14 +49,14 @@ void TimestampThread()
 
 	//initialization
 	timestamp_master = 0;
-
+	timestampOffsetServerApp.clear();
 	
 
 	THIS_APP_ID = GenerateAPP_ID();
 
 	std::chrono::time_point<std::chrono::system_clock> t = std::chrono::system_clock::now();
 
-	while (true)
+	while (!finish_application)
 	{
 		timestamp_master += 1;
 		t += std::chrono::milliseconds(10);
@@ -128,6 +129,7 @@ bool TimeSynchronizationGetVEH_ID(DDS::DomainParticipant_var m_participant, DDS:
 	long  offsetServerApp = MedianOffsetServerApp();
 
 	cout << "Delay = " << delayToAndFrom / 2 << endl;
+	long tiiii = GetTimestamp();
 
 	SetTimestamp(GetTimestamp() + offsetServerApp + delayToAndFrom/2);
 
