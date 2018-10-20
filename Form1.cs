@@ -285,7 +285,14 @@ namespace test01csharp
                 textBox1.Text = t;
 
 
-                updateSubjectCarLocation(-48.829f, 2732.424f, 0f,0.1f, 0f, 0f, 0f);
+                //updateSubjectCarLocation(-48.829f, 2732.424f, 0f,0.1f, 0f, 0f, 0f);
+
+                //error
+                updateSubjectCarLocation(26.21f, -31.5f, 0f, 1.56f, 0f, 0f, 0f);
+
+                //updateSubjectCarLocation(-11.9f, -33.4f, 0f,4.7f, 0f, 0f, 0f);
+
+
 
                 updateBrakeStatus(0.99f);
 

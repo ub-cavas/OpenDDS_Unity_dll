@@ -137,11 +137,13 @@ float doNotPassWarning(double h_x, double h_y, double h_h, double t_x, double t_
 	t_h = fmod((t_h + (2 * PI)), (2 * PI));
 
 
-	double alpha_right = h_h + (0.65 * PI);
-	alpha_right = fmod((alpha_right + (2 * PI)), (2 * PI));
+	//20181018
+	//double alpha_right = h_h + (0.65 * PI);
+	//alpha_right = fmod((alpha_right + (2 * PI)), (2 * PI));
 
-	double alpha_left = h_h - (0.65 * PI);
-	alpha_left = fmod((alpha_left + (2 * PI)), (2 * PI));
+	////double alpha_left = h_h - (0.65 * PI);
+	//double alpha_left = h_h + (1.35 * PI);
+	//alpha_left = fmod((alpha_left + (2 * PI)), (2 * PI));
 	
 
 	Point2D a_oryg = { 0,11 };
@@ -157,7 +159,8 @@ float doNotPassWarning(double h_x, double h_y, double h_h, double t_x, double t_
 
 	Point2D x_veh_point;
 
-	if ((t_h < alpha_left && t_h > alpha_right) || ((alpha_left<(-PI / 2) && alpha_right>(PI / 2)) && (t_h < alpha_left || t_h > alpha_right)))
+	//if ((t_h < alpha_left && t_h > alpha_right) || ((alpha_left<(-PI / 2) && alpha_right>(PI / 2)) && (t_h < alpha_left || t_h > alpha_right)))
+	if  ((abs(h_h-t_h) > (0.65 * PI)) && (abs(h_h - t_h) < (1.35 * PI)))
 	{
 		a = { a.x + h_x, a.y + h_y };
 		b = { b.x + h_x, b.y + h_y };
