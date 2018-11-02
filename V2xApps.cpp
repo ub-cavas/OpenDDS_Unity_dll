@@ -121,7 +121,7 @@ bool PointInTriangle(Point2D pt, Point2D v1, Point2D v2, Point2D v3)
 
 
 //checks if tested vehicle (t_) is on the opposite lane on the road
-//if it does, return distance from human veh and other('tested") veh
+//if it does, return distance from human veh and the other('tested") veh
 //if it doesn't return -1   which means no warning
 float doNotPassWarning(double h_x, double h_y, double h_h, double t_x, double t_y, double t_h)
 {
@@ -140,7 +140,6 @@ float doNotPassWarning(double h_x, double h_y, double h_h, double t_x, double t_
 	//20181018
 	//double alpha_right = h_h + (0.65 * PI);
 	//alpha_right = fmod((alpha_right + (2 * PI)), (2 * PI));
-
 	////double alpha_left = h_h - (0.65 * PI);
 	//double alpha_left = h_h + (1.35 * PI);
 	//alpha_left = fmod((alpha_left + (2 * PI)), (2 * PI));
@@ -181,6 +180,87 @@ float doNotPassWarning(double h_x, double h_y, double h_h, double t_x, double t_
 	return distance;
 
 }
+
+
+
+
+// output - float - time to collision in sec. If there is no collision value is -1
+float intersectionWarning(double h_x, double h_y, double h_h, double h_speed, double t_x, double t_y, double t_h, double t_speed) {
+	
+	float h_distance_intersection;
+	float t_distance_intersection;
+	float h_time_intersection;
+	float t_time_intersection;
+
+	float timeToCollision = -1; //initial value, -1 means no collision
+
+	//line equation, y = mx + c
+	//c = y - mx
+
+	//std::cout << "Degree subject car : " << rad2Degree(h_h);
+	float m1 = tan(h_h);
+	float c1 = (h_y - m1 * h_x);
+
+	float m2 = tan(t_h);
+	float c2 = (t_y - m2 * t_x);
+
+	float x_intercept = ((c2 - c1) / (m1 - m2));
+	float y_intercept = (m1*x_intercept + c1);
+
+	//slope of lines formed by intercept and the car.If same direction then point is in 
+	//front else direction is opposite and point is at back
+	float subjectCarIntercept = fmod((atan2((y_intercept - h_y), (x_intercept - h_x)) + 2 * PI), (2 * PI));
+
+	float otherIntercept = fmod((atan2((y_intercept - t_y), (x_intercept - t_x)) + 2 * PI), (2 * PI));
+
+	if (abs(h_h - t_h) <= 0.08) {
+		//std::cout << "Parallel cars";
+		//outcome = "Parallel cars";
+		timeToCollision = -1;
+	}
+	else {
+		if (abs(subjectCarIntercept - h_h) <= 0.08 && abs(otherIntercept - t_h) <= 0.08) {
+			h_distance_intersection = sqrt(pow((h_x - x_intercept), 2) + pow((h_y - y_intercept), 2));
+			t_distance_intersection = sqrt(pow((t_x - x_intercept), 2) + pow((t_y - y_intercept), 2));
+
+			h_time_intersection = (h_distance_intersection) / h_speed;
+			t_time_intersection = (t_distance_intersection) / t_speed;
+
+			if ((h_time_intersection - t_time_intersection) > 2) {
+				//outcome = "They do not intersect.";
+				timeToCollision = -1;
+			}
+			else
+			{
+				//std::cout << "Intersection at x : " << x_intercept << "  y : " << y_intercept;
+				//outcome = "Intersection at x : " + (std::to_string)(x_intercept) + "  y : " + (std::to_string)(y_intercept);
+
+				timeToCollision = t_time_intersection;
+			}
+		}
+		else {
+			//std::cout << "They do not intersect.";
+			//outcome = "They do not intersect.";
+			timeToCollision = -1;
+		}
+	}
+	return timeToCollision;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 //sendV2X(x.second.vehicle_id, GetTimestamp(), message_text);

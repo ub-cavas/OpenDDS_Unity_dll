@@ -537,6 +537,7 @@ void v2xMapThread() {
 		BSMCoreData _vehBSM;
 
 		float distance = -1;
+		float distanceIntersectionCollision = -1;	// Intersection Warning V2X
 
 
 
@@ -551,7 +552,11 @@ void v2xMapThread() {
 
 			if (subjectCar1.vehicle_id != _vehBSM.vehicle_id)
 			{
-				//checks distance between our subject car(human controled) and other car _veh 
+
+
+
+
+				//checks distance between our subject car(human controled) and other car _veh ---------------------------------------------
 				distance = doNotPassWarning(subjectCar1.position_x, subjectCar1.position_y, subjectCar1.orient_heading, _vehBSM.position_x, _vehBSM.position_y, _vehBSM.orient_heading);
 
 				if (distance>0 && distance <160)
@@ -568,9 +573,19 @@ void v2xMapThread() {
 					}
 
 				}
-				/*		cout << endl << GetTimestamp() << "   V2X: senderId  = " << _v2x.sender_id
-				<< "     receiverId = " << _v2x.recipient_id
-				<< "     veh_X=" << _veh.position_x << " y=" << _veh.position_y << endl;*/
+				//--------------------------------------------------------------------------------------------------------------------------
+
+
+				distanceIntersectionCollision = intersectionWarning(subjectCar1.position_x, subjectCar1.position_y, subjectCar1.orient_heading, subjectCar1.speed,
+																	_vehBSM.position_x, _vehBSM.position_y, _vehBSM.orient_heading, _vehBSM.speed);
+
+
+
+
+
+
+
+
 			}
 
 

@@ -35,6 +35,8 @@ bool PointInTriangle(Point2D pt, Point2D v1, Point2D v2, Point2D v3);
 
 float doNotPassWarning(double h_x, double h_y, double h_h, double t_x, double t_y, double t_h);
 
+float intersectionWarning(double h_x, double h_y, double h_h, double h_speed, double t_x, double t_y, double t_h, double t_speed);
+
 void sendV2X(long sender_id, long sender_timestamp, std::string message);
 
 std::string createBSMcoreData(Mri::VehData veh, float brakeForce);
