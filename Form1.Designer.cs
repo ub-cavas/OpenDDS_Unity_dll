@@ -36,6 +36,8 @@
             this.button3 = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
+            this.label2 = new System.Windows.Forms.Label();
+            this.lblIwTime = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // textBox1
@@ -44,7 +46,7 @@
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
             this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.textBox1.Size = new System.Drawing.Size(713, 563);
+            this.textBox1.Size = new System.Drawing.Size(713, 437);
             this.textBox1.TabIndex = 5;
             // 
             // timer1
@@ -54,7 +56,7 @@
             // 
             // button5
             // 
-            this.button5.Location = new System.Drawing.Point(519, 628);
+            this.button5.Location = new System.Drawing.Point(475, 502);
             this.button5.Name = "button5";
             this.button5.Size = new System.Drawing.Size(86, 40);
             this.button5.TabIndex = 12;
@@ -64,7 +66,7 @@
             // 
             // button4
             // 
-            this.button4.Location = new System.Drawing.Point(380, 626);
+            this.button4.Location = new System.Drawing.Point(336, 500);
             this.button4.Name = "button4";
             this.button4.Size = new System.Drawing.Size(79, 43);
             this.button4.TabIndex = 11;
@@ -74,7 +76,7 @@
             // 
             // button3
             // 
-            this.button3.Location = new System.Drawing.Point(260, 624);
+            this.button3.Location = new System.Drawing.Point(216, 498);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(75, 46);
             this.button3.TabIndex = 10;
@@ -85,7 +87,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(621, 642);
+            this.label1.Location = new System.Drawing.Point(577, 516);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(35, 13);
             this.label1.TabIndex = 8;
@@ -93,7 +95,7 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(62, 624);
+            this.button1.Location = new System.Drawing.Point(18, 498);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(104, 44);
             this.button1.TabIndex = 13;
@@ -101,11 +103,31 @@
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click_2);
             // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(30, 570);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(130, 13);
+            this.label2.TabIndex = 14;
+            this.label2.Text = "IntersectionWarning time=";
+            // 
+            // lblIwTime
+            // 
+            this.lblIwTime.AutoSize = true;
+            this.lblIwTime.Location = new System.Drawing.Point(166, 570);
+            this.lblIwTime.Name = "lblIwTime";
+            this.lblIwTime.Size = new System.Drawing.Size(31, 13);
+            this.lblIwTime.TabIndex = 15;
+            this.lblIwTime.Text = "0000";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(738, 698);
+            this.ClientSize = new System.Drawing.Size(738, 617);
+            this.Controls.Add(this.lblIwTime);
+            this.Controls.Add(this.label2);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.button5);
             this.Controls.Add(this.button4);
@@ -128,6 +150,8 @@
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label lblIwTime;
     }
 }
 

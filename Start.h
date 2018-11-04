@@ -54,6 +54,8 @@ extern "C" RDTest void updateSubjectCarLocation( float pos_x, float pos_y, float
 
 extern "C" RDTest float GetDnpwDistance();
 
+extern "C" RDTest float GetIwTime();
+
 extern "C" RDTest void updateBrakeStatus(float brake);
 
 

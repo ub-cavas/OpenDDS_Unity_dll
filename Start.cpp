@@ -51,6 +51,9 @@ extern std::mutex mutexMap;
 extern std::atomic<float> dnpw_closestVehicleMessage_distance;
 extern std::atomic<long> dnpw_closestVehicleMessage_timestamp;
 
+extern std::atomic<float> iw_closestVehicle_time;
+extern std::atomic<long> iw_closestVehicle_timestamp;
+
 
 extern Mri::VehData subjectCar;
 extern float subjectCarBrakeForce; // 0 min, 1 max
@@ -451,6 +454,13 @@ float GetDnpwDistance()
 	dnpw_closestVehicleMessage_timestamp = 0;*/
 
 	return _distance;
+}
+
+// check the Intersection Warning time to collision, it time=-1 -> no warning
+float GetIwTime() {
+	float _iw_time = iw_closestVehicle_time;
+
+	return _iw_time;
 }
 
 

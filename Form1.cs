@@ -26,7 +26,10 @@ namespace test01csharp
         [DllImport("mri_opendds.dll", CallingConvention = CallingConvention.Cdecl)]
         public extern static float GetDnpwDistance();
         //extern "C" RDTest long GetDnpwDistance();
+        //extern "C" RDTest float GetIwTime();
 
+        [DllImport("mri_opendds.dll", CallingConvention = CallingConvention.Cdecl)]
+        public extern static float GetIwTime();
 
         [DllImport("mri_opendds.dll", CallingConvention = CallingConvention.Cdecl)]
         public extern static bool start_opendds();
@@ -298,6 +301,9 @@ namespace test01csharp
 
                 float dnpwDistance = GetDnpwDistance();
                 label1.Text = dnpwDistance.ToString() + " m";
+
+                float iwTime = GetIwTime();
+                lblIwTime.Text = iwTime.ToString() + " sec.";
 
             }
             catch (Exception )

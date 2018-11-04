@@ -80,6 +80,11 @@ std::atomic<long> dnpw_closestVehicleMessage_timestamp;
 //Electronic Emergency Brake Light (EEBL)
 std::atomic<float> eebl_closestVehicleMessage_distance;
 
+//Intersection Warning 
+std::atomic<float> iw_closestVehicle_time;
+std::atomic<long> iw_closestVehicle_timestamp;
+
+
 
 std::string log_rd_VehsMapThread;
 std::string log_rd_Opendds;
@@ -484,9 +489,12 @@ void OpenDDSThread(int argc, char* argv[]){
 
 
 
+				//keep dnpw_closestVehicleMessage_distance always up-to-date
+
+				long oldDistanceTimestamp = GetTimestamp() - 50;  //500 ms
 				if (dnpw_closestVehicleMessage_distance != 99999)
 				{
-					long oldDistanceTimestamp = GetTimestamp() - 50;  //500 ms
+					
 					if (dnpw_closestVehicleMessage_timestamp < oldDistanceTimestamp)
 					{
 						//old value, let's reset it
@@ -494,6 +502,13 @@ void OpenDDSThread(int argc, char* argv[]){
 						dnpw_closestVehicleMessage_timestamp = 0;
 					}
 
+				}
+
+				if (iw_closestVehicle_timestamp < oldDistanceTimestamp)
+				{
+					//old value, let's reset it
+					iw_closestVehicle_time = -1;
+					iw_closestVehicle_timestamp = 0;
 				}
 
 
@@ -537,7 +552,7 @@ void v2xMapThread() {
 		BSMCoreData _vehBSM;
 
 		float distance = -1;
-		float distanceIntersectionCollision = -1;	// Intersection Warning V2X
+		float timeIntersectionCollisionWarning = -1;	// Intersection Warning V2X
 
 
 
@@ -576,10 +591,18 @@ void v2xMapThread() {
 				//--------------------------------------------------------------------------------------------------------------------------
 
 
-				distanceIntersectionCollision = intersectionWarning(subjectCar1.position_x, subjectCar1.position_y, subjectCar1.orient_heading, subjectCar1.speed,
+				timeIntersectionCollisionWarning = intersectionWarning(subjectCar1.position_x, subjectCar1.position_y, subjectCar1.orient_heading, subjectCar1.speed,
 																	_vehBSM.position_x, _vehBSM.position_y, _vehBSM.orient_heading, _vehBSM.speed);
 
-
+				if (timeIntersectionCollisionWarning > 0)
+				{
+					if (timeIntersectionCollisionWarning < iw_closestVehicle_time)
+					{
+						//we display the closest vehicle warning, we need to update iw_closestVehicle_time
+						iw_closestVehicle_time = timeIntersectionCollisionWarning;
+						iw_closestVehicle_timestamp = GetTimestamp();
+					}
+				} 
 
 
 
