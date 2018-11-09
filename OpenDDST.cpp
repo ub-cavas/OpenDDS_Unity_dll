@@ -504,12 +504,17 @@ void OpenDDSThread(int argc, char* argv[]){
 
 				}
 
-				if (iw_closestVehicle_timestamp < oldDistanceTimestamp)
+				if (iw_closestVehicle_time!=99999)
 				{
-					//old value, let's reset it
-					iw_closestVehicle_time = -1;
-					iw_closestVehicle_timestamp = 0;
+					if (iw_closestVehicle_timestamp < oldDistanceTimestamp)
+					{
+						//old value, let's reset it
+						iw_closestVehicle_time = 99999;
+						iw_closestVehicle_timestamp = 0;
+					}
 				}
+
+				
 
 
 				garbageCollectionMap();
@@ -591,8 +596,13 @@ void v2xMapThread() {
 				//--------------------------------------------------------------------------------------------------------------------------
 
 
+				//timeIntersectionCollisionWarning = intersectionWarning(subjectCar1.position_x, subjectCar1.position_y, subjectCar1.orient_heading, subjectCar1.speed,
+				//													_vehBSM.position_x, _vehBSM.position_y, _vehBSM.orient_heading, _vehBSM.speed);
+				
+				
+				//test
 				timeIntersectionCollisionWarning = intersectionWarning(subjectCar1.position_x, subjectCar1.position_y, subjectCar1.orient_heading, subjectCar1.speed,
-																	_vehBSM.position_x, _vehBSM.position_y, _vehBSM.orient_heading, _vehBSM.speed);
+					_vehBSM.position_x, _vehBSM.position_y, _vehBSM.orient_heading, _vehBSM.speed);
 
 				if (timeIntersectionCollisionWarning > 0)
 				{
