@@ -595,12 +595,6 @@ void v2xMapThread() {
 				}
 				//--------------------------------------------------------------------------------------------------------------------------
 
-
-				//timeIntersectionCollisionWarning = intersectionWarning(subjectCar1.position_x, subjectCar1.position_y, subjectCar1.orient_heading, subjectCar1.speed,
-				//													_vehBSM.position_x, _vehBSM.position_y, _vehBSM.orient_heading, _vehBSM.speed);
-				
-				
-				//test
 				timeIntersectionCollisionWarning = intersectionWarning(subjectCar1.position_x, subjectCar1.position_y, subjectCar1.orient_heading, subjectCar1.speed,
 					_vehBSM.position_x, _vehBSM.position_y, _vehBSM.orient_heading, _vehBSM.speed);
 
@@ -613,10 +607,6 @@ void v2xMapThread() {
 						iw_closestVehicle_timestamp = GetTimestamp();
 					}
 				} 
-
-
-
-
 
 
 			}

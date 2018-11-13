@@ -35,11 +35,6 @@ std::thread threadTimestamp;
 int vehdataCount;
 
 std::string log_rd;
-//Mri::VehData* vehdata_array;
-
-//Mri::VehData vehArray[100];
-
-
 
 extern std::map<long, UnityVehicle> unityVehsMap;
 extern std::map<long, std::set<UnityVehicle>> unityVehsMapSets;
@@ -68,41 +63,6 @@ extern long VEH_ID;
 UnityVehicle unityVehArray[200];
 
 
-//void getVehsArray(int* Num_Vehicles, UnityVehicle** VehicleData) {
-//
-//
-//	int indx = 0;
-//	*Num_Vehicles = 0;
-//
-//
-//	if (vehs_map.size()>0)
-//	{
-//		std::map<long, Mri::VehData> vehs_map_copy2;
-//		vehs_map_copy2 = vehs_map;
-//
-//		std::cout << "............." << std::endl;
-//
-//		for (auto& x : vehs_map_copy2) {
-//			vehArray[indx] = x.second;
-//
-//			indx++;
-//
-//			std::cout << x.second.timestamp << "   vehId:" << x.second.vehicle_id << std::endl;
-//
-//		}
-//
-//		*VehicleData = vehArray;
-//		*Num_Vehicles = indx;
-//
-//	}
-//	else
-//	{
-//		std::cout << "..VehsMap empty ..." << std::endl;
-//
-//	}
-//
-//}
-
 
 void getVehsArray(int* Num_Vehicles, UnityVehicle** unityVehicleData) {
 
@@ -112,20 +72,6 @@ void getVehsArray(int* Num_Vehicles, UnityVehicle** unityVehicleData) {
 	*Num_Vehicles = 0;
 	log_rd = "";
 
-
-	//if (access_unityVehMapSets != ACCESS_none  && access_unityVehMapSets != ACCESS_getVehsArray)
-	//{
-	//	//request for access
-	//	access_unityVehMapSets = ACCESS_request_getVehsArray;
-	//}
-
-	//while (access_unityVehMapSets != ACCESS_none && access_unityVehMapSets != ACCESS_getVehsArray) {             // wait while getVehsArray accessing VehMapSets
-	//	
-	//	//std::this_thread::yield();
-	//	log_rd = "a";
-	//}
-
-	//access_unityVehMapSets = ACCESS_getVehsArray;
 
 	try
 	{
@@ -464,21 +410,3 @@ float GetIwTime() {
 }
 
 
-
-int  getR() {
-
-	int numVehicles;
-	UnityVehicle * vehicleData;
-
-	getVehsArray(&numVehicles, &vehicleData);
-
-	//getVehs();
-
-	return numVehicles;
-}
-
-
-
-int getD() {
-	return 34;
-}

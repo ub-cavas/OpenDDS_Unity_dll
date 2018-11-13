@@ -78,7 +78,15 @@ BSMCoreData readVehDatafromString(std::string message) {
 	std::getline(lineStream, cell, ';');
 	_bsm.vehicle_id = std::atol(cell.c_str());
 
-	//_bsm.brake_boost = 
+	
+	// 0 - unavailable, 1 - off, 2 - on;
+	//_bsm.brake_boost = 0; //initial value
+	cell = "0"; //initial value
+	//try to read real value from bsm
+
+	//if there is no brake_bost value in the bsm, cell remains unchanged ->   is 0
+	std::getline(lineStream, cell, ';');
+	_bsm.brake_boost = std::atol(cell.c_str());
 
 	return _bsm;
 
