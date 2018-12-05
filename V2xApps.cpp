@@ -234,7 +234,7 @@ float intersectionWarning(double h_x, double h_y, double h_h, double h_speed, do
 			h_time_intersection = (h_distance_intersection) / h_speed;
 			t_time_intersection = (t_distance_intersection) / t_speed;
 
-			if ((h_time_intersection - t_time_intersection) > 2) {
+			if (abs(h_time_intersection - t_time_intersection) > 2) {
 				//outcome = "They do not intersect.";
 				timeToCollision = -1;
 			}
@@ -244,6 +244,12 @@ float intersectionWarning(double h_x, double h_y, double h_h, double h_speed, do
 				//outcome = "Intersection at x : " + (std::to_string)(x_intercept) + "  y : " + (std::to_string)(y_intercept);
 
 				timeToCollision = t_time_intersection;
+
+				if (timeToCollision > 5) {
+					//we skip this warning
+					timeToCollision = -1;
+				}
+
 			}
 		}
 		else {

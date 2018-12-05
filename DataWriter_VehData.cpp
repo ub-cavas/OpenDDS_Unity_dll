@@ -122,6 +122,7 @@ DataWriter_VehData::createDataWriter()
 	DDS::DataWriterQos dw_qos;
 	publisher->get_default_datawriter_qos(dw_qos);
 	dw_qos.history.kind = DDS::KEEP_LAST_HISTORY_QOS;
+	dw_qos.history.depth = 5;
 	dw_qos.reliability.kind = DDS::BEST_EFFORT_RELIABILITY_QOS;
 	dw_qos.reliability.max_blocking_time.sec = 10;
 	dw_qos.reliability.max_blocking_time.nanosec = 0;
