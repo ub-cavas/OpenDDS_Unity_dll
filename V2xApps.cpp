@@ -167,6 +167,9 @@ float doNotPassWarning(double h_x, double h_y, double h_h, double t_x, double t_
 	Point2D x_veh_point;
 
 	//if ((t_h < alpha_left && t_h > alpha_right) || ((alpha_left<(-PI / 2) && alpha_right>(PI / 2)) && (t_h < alpha_left || t_h > alpha_right)))
+
+
+
 	if  ((abs(h_h-t_h) > (0.65 * PI)) && (abs(h_h - t_h) < (1.35 * PI)))
 	{
 		a = { a.x + h_x, a.y + h_y };
@@ -195,6 +198,20 @@ float doNotPassWarning(double h_x, double h_y, double h_h, double t_x, double t_
 // output - float - time to collision in sec. If there is no collision value is -1
 float intersectionWarning(double h_x, double h_y, double h_h, double h_speed, double t_x, double t_y, double t_h, double t_speed) {
 	
+	
+	//____________________________________________________________
+	//
+	//	TEST ONLY
+	//
+
+	h_speed = 5;
+	t_speed = 5;
+	//____________________________________________________________
+	
+	
+	
+	
+	
 	float h_distance_intersection;
 	float t_distance_intersection;
 	float h_time_intersection;
@@ -222,7 +239,7 @@ float intersectionWarning(double h_x, double h_y, double h_h, double h_speed, do
 	float otherIntercept = fmod((atan2((y_intercept - t_y), (x_intercept - t_x)) + 2 * PI), (2 * PI));
 
 	if (abs(h_h - t_h) <= 0.08) {
-		//std::cout << "Parallel cars";
+		std::cout << "Parallel cars";
 		//outcome = "Parallel cars";
 		timeToCollision = -1;
 	}
