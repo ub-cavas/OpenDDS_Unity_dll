@@ -310,7 +310,9 @@ bool start_opendds() {
 	threadOpenDDS_initialized = false;
 	//char *argv2[] = { "-DCPSConfigFile","C:\\rtps\\rtps.ini" };
 
-	char *argv2[] = { "-DCPSConfigFile","C:\\iCAVE2\\Bin\\OpenDDS_Repo\\rtps.ini" };
+	//char *argv2[] = { "-DCPSConfigFile","C:\\iCAVE2\\Bin\\OpenDDS_Repo\\rtps.ini" };
+
+	char *argv2[] = { "-DCPSConfigFile","C:\\iCAVE2\\Bin\\rtps.ini" };
 
 	int argc = 2;
 
