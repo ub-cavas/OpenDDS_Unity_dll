@@ -42,14 +42,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="test01csharp.exe" size="23976">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="test01csharp.exe" size="23040">
       <assemblyIdentity name="test01csharp" version="1.0.0.0" language="neutral" processorArchitecture="amd64" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>cNKELEgTjfrRhOgZGXc8Mb64Yv3CoBPkWaZsHz2emlE=</dsig:DigestValue>
+        <dsig:DigestValue>HLFtYOqzF9Wc+5kjXKh4PJzp4IxtiuPACoaDV0bCUF4=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

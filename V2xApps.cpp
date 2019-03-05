@@ -153,18 +153,7 @@ float doNotPassWarning(double h_x, double h_y, double h_h, double t_x, double t_
 	//alpha_left = fmod((alpha_left + (2 * PI)), (2 * PI));
 	
 
-	Point2D a_oryg = { 0,11 };
-	Point2D b_oryg = { 260,18 };
-	Point2D c_oryg = { 260,-3 };
-	Point2D d_oryg = { 0,-3 };
-
-
-	Point2D a = RotatePoint(a_oryg, h_h);
-	Point2D b = RotatePoint(b_oryg, h_h);
-	Point2D c = RotatePoint(c_oryg, h_h);
-	Point2D d = RotatePoint(d_oryg, h_h);
-
-	Point2D x_veh_point;
+	
 
 	//if ((t_h < alpha_left && t_h > alpha_right) || ((alpha_left<(-PI / 2) && alpha_right>(PI / 2)) && (t_h < alpha_left || t_h > alpha_right)))
 
@@ -172,6 +161,20 @@ float doNotPassWarning(double h_x, double h_y, double h_h, double t_x, double t_
 
 	if  ((abs(h_h-t_h) > (0.65 * PI)) && (abs(h_h - t_h) < (1.35 * PI)))
 	{
+		Point2D a_oryg = { 0,11 };
+		Point2D b_oryg = { 260,18 };
+		Point2D c_oryg = { 260,-3 };
+		Point2D d_oryg = { 0,-3 };
+
+
+		Point2D a = RotatePoint(a_oryg, h_h);
+		Point2D b = RotatePoint(b_oryg, h_h);
+		Point2D c = RotatePoint(c_oryg, h_h);
+		Point2D d = RotatePoint(d_oryg, h_h);
+
+		Point2D x_veh_point;
+
+
 		a = { a.x + h_x, a.y + h_y };
 		b = { b.x + h_x, b.y + h_y };
 		c = { c.x + h_x, c.y + h_y };
