@@ -207,8 +207,8 @@ float intersectionWarning(double h_x, double h_y, double h_h, double h_speed, do
 	//	TEST ONLY
 	//
 
-	h_speed = 5;
-	t_speed = 5;
+	h_speed = 3;
+	t_speed = 3;
 	//____________________________________________________________
 	
 	
