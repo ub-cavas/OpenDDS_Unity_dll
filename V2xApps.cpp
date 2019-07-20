@@ -195,7 +195,59 @@ float doNotPassWarning(double h_x, double h_y, double h_h, double t_x, double t_
 
 }
 
+//checks if tested vehicle needs to brake based on if vehicles in front hard brake
+//if it does, returns distance from vehicle hard braking and tested vehicle (to give tested vehicle ample time to brake)
+//if it doesn't, returns -1 (no warning)
+float emergencyBrakeWarning (double h_x, double h_y, double h_h, double t_x, double t_y, double t_h)
+{
+	// h_  human controlled veh
+	// t_  tested veh
 
+	//no warning -> distance = -1
+	float distance = -1;
+
+
+	//normalization
+	h_h = fmod((h_h + (2 * PI)), (2 * PI));
+	t_h = fmod((t_h + (2 * PI)), (2 * PI));
+
+
+	//check if the tested veh heading is close to human controled heading
+	if (abs(h_h - t_h) < (0.44 * PI)|| abs(h_h - t_h) > (1.56 * PI))
+	{
+		Point2D a_oryg = { 0,5 };
+		Point2D b_oryg = { 260,7 };
+		Point2D c_oryg = { 260,-5 };
+		Point2D d_oryg = { 0,-3 };
+
+
+		Point2D a = RotatePoint(a_oryg, h_h);
+		Point2D b = RotatePoint(b_oryg, h_h);
+		Point2D c = RotatePoint(c_oryg, h_h);
+		Point2D d = RotatePoint(d_oryg, h_h);
+
+		Point2D x_veh_point;
+
+
+		a = { a.x + h_x, a.y + h_y };
+		b = { b.x + h_x, b.y + h_y };
+		c = { c.x + h_x, c.y + h_y };
+		d = { d.x + h_x, d.y + h_y };
+
+		x_veh_point = { t_x, t_y };
+
+		if (PointInTriangle(x_veh_point, a, b, c) || PointInTriangle(x_veh_point, a, c, d))
+		{
+			//show warning and distance
+			distance = sqrt(pow((t_x - h_x), 2.0) + pow((t_y - h_y), 2.0));
+
+		}
+	}
+
+
+	return distance;
+
+}
 
 
 // output - float - time to collision in sec. If there is no collision value is -1
