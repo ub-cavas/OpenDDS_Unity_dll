@@ -379,9 +379,7 @@ void sendV2X(long sender_id, long sender_timestamp, string message) {
 string createBSMcoreData(Mri::VehData veh, float brakeForce) {
 
 
-	const int BRAKE_BOOST_UNAVAILABLE = 0;
-	const int BRAKE_BOOST_OFF = 1;
-	const int BRAKE_BOOST_ON = 2;
+	
 
 	int brakeBoost = 0;
 	if (brakeForce >= BRAKE_BOOST_THRESHOLD)

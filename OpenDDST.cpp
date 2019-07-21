@@ -79,6 +79,8 @@ std::atomic<long> dnpw_closestVehicleMessage_timestamp;
 
 //Electronic Emergency Brake Light (EEBL)
 std::atomic<float> eebl_closestVehicleMessage_distance;
+std::atomic<long> eebl_closestVehicleMessage_timestamp;
+
 
 //Intersection Warning 
 std::atomic<float> iw_closestVehicle_time;
@@ -579,8 +581,8 @@ void v2xMapThread() {
 				//checks distance between our subject car(human controled) and other car _veh ---------------------------------------------
 				distance = doNotPassWarning(subjectCar1.position_x, subjectCar1.position_y, subjectCar1.orient_heading, _vehBSM.position_x, _vehBSM.position_y, _vehBSM.orient_heading);
 
-				if (distance>0 && distance <160)
-				{	
+				if (distance > 0 && distance < 160)
+				{
 					// dnpw_closestVehicleMessage_distance - variable with distance to the nearest vehicle on the opposite lane
 
 					if (distance < dnpw_closestVehicleMessage_distance)
@@ -589,29 +591,54 @@ void v2xMapThread() {
 						dnpw_closestVehicleMessage_distance = distance;
 						dnpw_closestVehicleMessage_timestamp = GetTimestamp();
 
-						cout << "Warning distance=" << dnpw_closestVehicleMessage_distance << " at=" << dnpw_closestVehicleMessage_timestamp << endl;
+						//cout << "Warning distance=" << dnpw_closestVehicleMessage_distance << " at=" << dnpw_closestVehicleMessage_timestamp << endl;
 					}
 
 				}
+
+
+				if (_vehBSM.brake_boost == BRAKE_BOOST_ON)
+				{
+					//emergencyBrakeWarning (double h_x, double h_y, double h_h, double t_x, double t_y, double t_h)
+					distance = emergencyBrakeWarning(subjectCar1.position_x, subjectCar1.position_y, subjectCar1.orient_heading, _vehBSM.position_x, _vehBSM.position_y, _vehBSM.orient_heading);
+
+					if (distance > 0 && distance < 160)
+					{
+
+						if (distance < eebl_closestVehicleMessage_distance)
+						{
+							//this vehicle is closer, we have to update
+							eebl_closestVehicleMessage_distance = distance;
+							eebl_closestVehicleMessage_timestamp = GetTimestamp();
+
+							//cout << "Warning distance=" << dnpw_closestVehicleMessage_distance << " at=" << dnpw_closestVehicleMessage_timestamp << endl;
+						}
+
+					}
+				}
+
+
+
 				//--------------------------------------------------------------------------------------------------------------------------
 
-				timeIntersectionCollisionWarning = intersectionWarning(subjectCar1.position_x, subjectCar1.position_y, subjectCar1.orient_heading, subjectCar1.speed,
-					_vehBSM.position_x, _vehBSM.position_y, _vehBSM.orient_heading, _vehBSM.speed);
+				//timeIntersectionCollisionWarning = intersectionWarning(subjectCar1.position_x, subjectCar1.position_y, subjectCar1.orient_heading, subjectCar1.speed,
+				//	_vehBSM.position_x, _vehBSM.position_y, _vehBSM.orient_heading, _vehBSM.speed);
 
-				if (timeIntersectionCollisionWarning > 0)
-				{
-					if (timeIntersectionCollisionWarning < iw_closestVehicle_time)
-					{
-						//we display the closest vehicle warning, we need to update iw_closestVehicle_time
-						iw_closestVehicle_time = timeIntersectionCollisionWarning;
-						iw_closestVehicle_timestamp = GetTimestamp();
-					}
-				} 
+				//if (timeIntersectionCollisionWarning > 0)
+				//{
+				//	if (timeIntersectionCollisionWarning < iw_closestVehicle_time)
+				//	{
+				//		//we display the closest vehicle warning, we need to update iw_closestVehicle_time
+				//		iw_closestVehicle_time = timeIntersectionCollisionWarning;
+				//		iw_closestVehicle_timestamp = GetTimestamp();
+				//	}
+				//} 
+
+
+			//}
 
 
 			}
-
-
 		}
 	}
 }

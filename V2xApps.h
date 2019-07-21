@@ -4,6 +4,9 @@
 
 #include "MriTypeSupportImpl.h"
 
+const int BRAKE_BOOST_UNAVAILABLE = 0;
+const int BRAKE_BOOST_OFF = 1;
+const int BRAKE_BOOST_ON = 2;
 
 struct BSMCoreData
 {
@@ -34,6 +37,8 @@ float sign(Point2D p1, Point2D p2, Point2D p3);
 bool PointInTriangle(Point2D pt, Point2D v1, Point2D v2, Point2D v3);
 
 float doNotPassWarning(double h_x, double h_y, double h_h, double t_x, double t_y, double t_h);
+
+float emergencyBrakeWarning(double h_x, double h_y, double h_h, double t_x, double t_y, double t_h);
 
 float intersectionWarning(double h_x, double h_y, double h_h, double h_speed, double t_x, double t_y, double t_h, double t_speed);
 

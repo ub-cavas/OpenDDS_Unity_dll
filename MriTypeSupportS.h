@@ -28,8 +28,8 @@
 // TAO_IDL - Generated from
 // be\be_codegen.cpp:461
 
-#ifndef _TAO_IDL_MRITYPESUPPORTS_FWF7DO_H_
-#define _TAO_IDL_MRITYPESUPPORTS_FWF7DO_H_
+#ifndef _TAO_IDL_MRITYPESUPPORTS_Y7DJRF_H_
+#define _TAO_IDL_MRITYPESUPPORTS_Y7DJRF_H_
 
 #include /**/ "ace/pre.h"
 
