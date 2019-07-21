@@ -452,6 +452,10 @@ void OpenDDSThread(int argc, char* argv[]){
 			dnpw_closestVehicleMessage_distance = 99999;	//initial value.  99999 means a vehicle is out of range
 			dnpw_closestVehicleMessage_timestamp = 0;
 
+			//emergency brake v2x
+			eebl_closestVehicleMessage_distance = 99999;
+			eebl_closestVehicleMessage_timestamp = 0;
+
 
 			
 			//create reader to receive V2X message  Mri_V2XfromNS3  (Mri_V2XtoNS3)
