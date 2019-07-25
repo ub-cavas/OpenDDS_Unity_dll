@@ -46,6 +46,10 @@ extern std::mutex mutexMap;
 extern std::atomic<float> dnpw_closestVehicleMessage_distance;
 extern std::atomic<long> dnpw_closestVehicleMessage_timestamp;
 
+extern std::atomic<float> eebl_closestVehicleMessage_distance;
+extern std::atomic<long> eebl_closestVehicleMessage_timestamp;
+
+
 extern std::atomic<float> iw_closestVehicle_time;
 extern std::atomic<long> iw_closestVehicle_timestamp;
 
@@ -402,6 +406,13 @@ float GetDnpwDistance()
 	dnpw_closestVehicleMessage_timestamp = 0;*/
 
 	return _distance;
+}
+
+float GetEeblDistance()
+{
+	float _eebl_distance = eebl_closestVehicleMessage_distance;
+
+	return _eebl_distance;
 }
 
 // check the Intersection Warning time to collision, it time=-1 -> no warning

@@ -52,11 +52,15 @@ extern "C" RDTest void getVehsArray(int * Num_Vehicles, UnityVehicle ** VehicleD
 
 extern "C" RDTest void updateSubjectCarLocation( float pos_x, float pos_y, float pos_z, float heading, float pitch, float roll,float speed);
 
+extern "C" RDTest void updateBrakeStatus(float brake);
+
 extern "C" RDTest float GetDnpwDistance();
+
+extern "C" RDTest float GetEeblDistance();
 
 extern "C" RDTest float GetIwTime();
 
-extern "C" RDTest void updateBrakeStatus(float brake);
+
 
 
 //UnityVehicle interpolateVehPosition(std::set<UnityVehicle>* _set, long x_timestamp);
