@@ -411,7 +411,6 @@ float GetDnpwDistance()
 float GetEeblDistance()
 {
 	float _eebl_distance = eebl_closestVehicleMessage_distance;
-
 	return _eebl_distance;
 }
 

@@ -41,24 +41,24 @@ struct UnityVehicle
 	}
 };
 
-#define RDTest __declspec (dllexport)
+#define _RD_dll __declspec (dllexport)
 
-extern "C" RDTest bool start_opendds();
+extern "C" _RD_dll bool start_opendds();
 
-extern "C" RDTest void stop_opendds();
+extern "C" _RD_dll void stop_opendds();
 
 
-extern "C" RDTest void getVehsArray(int * Num_Vehicles, UnityVehicle ** VehicleData);
+extern "C" _RD_dll void getVehsArray(int * Num_Vehicles, UnityVehicle ** VehicleData);
 
-extern "C" RDTest void updateSubjectCarLocation( float pos_x, float pos_y, float pos_z, float heading, float pitch, float roll,float speed);
+extern "C" _RD_dll void updateSubjectCarLocation( float pos_x, float pos_y, float pos_z, float heading, float pitch, float roll,float speed);
 
-extern "C" RDTest void updateBrakeStatus(float brake);
+extern "C" _RD_dll void updateBrakeStatus(float brake); // get brake value (between 0 and 1) from Unity. Later we need to convert this float value to: BRAKE_BOOST_UNAVAILABLE = 0;BRAKE_BOOST_OFF = 1; BRAKE_BOOST_ON = 2;
 
-extern "C" RDTest float GetDnpwDistance();
+extern "C" _RD_dll float GetDnpwDistance();
 
-extern "C" RDTest float GetEeblDistance();
+extern "C" _RD_dll float GetEeblDistance();
 
-extern "C" RDTest float GetIwTime();
+extern "C" _RD_dll float GetIwTime();
 
 
 

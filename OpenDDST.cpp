@@ -124,29 +124,6 @@ UnityVehicle  convertUnityVeh(Mri::VehData veh) {
 
 
 
-//void convertUnityVehOld(Mri::VehData* veh, UnityVehicle* uVeh) {
-//	//no copy strings
-//
-//	uVeh->color = veh->color;
-//	uVeh->lane_index = veh->lane_index;
-//	uVeh->leading_vehicle_id = veh->leading_vehicle_id;
-//	uVeh->link_coordinate = veh->link_coordinate;
-//	uVeh->link_id = veh->link_id;
-//	uVeh->orient_heading = veh->orient_heading;
-//	uVeh->orient_pitch = veh->orient_pitch;
-//	uVeh->orient_roll = veh->orient_roll;
-//	uVeh->position_x = veh->position_x;
-//	uVeh->position_y = veh->position_y;
-//	uVeh->position_z = veh->position_z;
-//	uVeh->speed = veh->speed;
-//	uVeh->timestamp = veh->timestamp;
-//	uVeh->trailing_vehicle_id = veh->trailing_vehicle_id;
-//	uVeh->turning_indicator = veh->turning_indicator;
-//	uVeh->vehicle_id = veh->vehicle_id;
-//	uVeh->vehicle_type = veh->vehicle_type;
-//
-//}
-
 void publishBSMThread() {
 
 	Mri::VehData _veh;
@@ -510,15 +487,29 @@ void OpenDDSThread(int argc, char* argv[]){
 
 				}
 
-				if (iw_closestVehicle_time!=99999)
+				oldDistanceTimestamp = oldDistanceTimestamp - 1000;
+
+				if (eebl_closestVehicleMessage_distance != 99999)
 				{
-					if (iw_closestVehicle_timestamp < oldDistanceTimestamp)
+
+					if (eebl_closestVehicleMessage_timestamp < oldDistanceTimestamp)
 					{
 						//old value, let's reset it
-						iw_closestVehicle_time = 99999;
-						iw_closestVehicle_timestamp = 0;
+						eebl_closestVehicleMessage_distance = 99999;
+						eebl_closestVehicleMessage_timestamp = 0;
 					}
+
 				}
+
+				//if (iw_closestVehicle_time!=99999)
+				//{
+				//	if (iw_closestVehicle_timestamp < oldDistanceTimestamp)
+				//	{
+				//		//old value, let's reset it
+				//		iw_closestVehicle_time = 99999;
+				//		iw_closestVehicle_timestamp = 0;
+				//	}
+				//}
 
 				
 
@@ -568,6 +559,10 @@ void v2xMapThread() {
 
 
 
+		
+
+
+
 		//wait for something at the queue
 		v2x_queue.pop(_v2x);
 		{
@@ -606,7 +601,7 @@ void v2xMapThread() {
 					//emergencyBrakeWarning (double h_x, double h_y, double h_h, double t_x, double t_y, double t_h)
 					distance = emergencyBrakeWarning(subjectCar1.position_x, subjectCar1.position_y, subjectCar1.orient_heading, _vehBSM.position_x, _vehBSM.position_y, _vehBSM.orient_heading);
 
-					if (distance > 0 && distance < 160)
+					if (distance > 0 && distance < 260)
 					{
 
 						if (distance < eebl_closestVehicleMessage_distance)
@@ -619,9 +614,17 @@ void v2xMapThread() {
 						}
 
 					}
+
+
+					
+
+
+
+
+
 				}
 
-
+				
 
 				//--------------------------------------------------------------------------------------------------------------------------
 
@@ -643,6 +646,11 @@ void v2xMapThread() {
 
 
 			}
+
+			//TEST ONLY
+			//8/2/2019
+			/*eebl_closestVehicleMessage_distance = 92;
+			eebl_closestVehicleMessage_timestamp = GetTimestamp();*/
 		}
 	}
 }
