@@ -487,7 +487,7 @@ void OpenDDSThread(int argc, char* argv[]){
 
 				}
 
-				oldDistanceTimestamp = oldDistanceTimestamp - 1000;
+				oldDistanceTimestamp = oldDistanceTimestamp - 100;
 
 				if (eebl_closestVehicleMessage_distance != 99999)
 				{
@@ -601,7 +601,7 @@ void v2xMapThread() {
 					//emergencyBrakeWarning (double h_x, double h_y, double h_h, double t_x, double t_y, double t_h)
 					distance = emergencyBrakeWarning(subjectCar1.position_x, subjectCar1.position_y, subjectCar1.orient_heading, _vehBSM.position_x, _vehBSM.position_y, _vehBSM.orient_heading);
 
-					if (distance > 0 && distance < 260)
+					if (distance > 0 && distance < 160)
 					{
 
 						if (distance < eebl_closestVehicleMessage_distance)
