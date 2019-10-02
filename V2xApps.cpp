@@ -216,8 +216,8 @@ float emergencyBrakeWarning (double h_x, double h_y, double h_h, double t_x, dou
 	if (abs(h_h - t_h) < (0.44 * PI)|| abs(h_h - t_h) > (1.56 * PI))
 	{
 		Point2D a_oryg = { 0,5 };
-		Point2D b_oryg = { 160,15 };
-		Point2D c_oryg = { 160,-10 };
+		Point2D b_oryg = { 160,17 };
+		Point2D c_oryg = { 160,-15 };
 		Point2D d_oryg = { 0,-3 };
 
 
